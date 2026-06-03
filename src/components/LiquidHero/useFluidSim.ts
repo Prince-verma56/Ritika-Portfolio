@@ -21,7 +21,7 @@ export function useFluidSim({
   imageUrl,
   videoEl,
   strength = 0.12,
-  brushRadius = 0.18,
+  brushRadius = 0.08,
   dissipation = 0.97,
 }: FluidSimOptions) {
   const mouseRef = useRef({ x: 0.5, y: 0.5 });
@@ -68,7 +68,6 @@ export function useFluidSim({
     // --- Full-screen quad ---
     const quadBuffer = gl.createBuffer()!;
     gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
-    // position (x,y) + uv (u,v) interleaved
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array([
@@ -123,7 +122,6 @@ export function useFluidSim({
       canvas.width = W;
       canvas.height = H;
       gl.viewport(0, 0, W, H);
-      // Recreate FBOs at new size
       read = createFBO(W, H);
       write = createFBO(W, H);
     };
@@ -134,7 +132,6 @@ export function useFluidSim({
     // --- Image / video texture ---
     const imageTex = gl.createTexture()!;
     gl.bindTexture(gl.TEXTURE_2D, imageTex);
-    // Placeholder 1x1 pixel while loading
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0,0,0,255]));
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -166,7 +163,7 @@ export function useFluidSim({
         mediaReady = true;
       }
 
-      // Decay velocity each frame (smooth settle)
+      // Decay velocity each frame
       velocityRef.current.x *= 0.85;
       velocityRef.current.y *= 0.85;
 
@@ -174,8 +171,8 @@ export function useFluidSim({
       let currentBrushRadius = brushRadius;
       let currentDissipation = dissipation;
       if (isDownRef.current) {
-        currentBrushRadius = brushRadius * 1.5; // larger brush radius when holding/dragging
-        currentDissipation = Math.min(0.99, dissipation + 0.015); // slower decay / swirl trails longer
+        currentBrushRadius = brushRadius * 1.5;
+        currentDissipation = Math.min(0.99, dissipation + 0.015);
       }
 
       // --- Pass 1: fluid update ---
@@ -216,6 +213,8 @@ export function useFluidSim({
       gl.uniform1i(gl.getUniformLocation(renderProgram, "tFluid"), 1);
 
       gl.uniform1f(gl.getUniformLocation(renderProgram, "uStrength"), strength);
+      gl.uniform2f(gl.getUniformLocation(renderProgram, "uTexelSize"), 1.0 / W, 1.0 / H);
+
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     };
 
@@ -236,8 +235,6 @@ export function useFluidSim({
         initialized = true;
       }
 
-      // Velocity = delta from last position, scaled for UV space
-      // Larger force scaling when holding down/stretching
       const forceScale = isDownRef.current ? 12.0 : 6.0;
       velocityRef.current.x = (x - lastX) * forceScale;
       velocityRef.current.y = (y - lastY) * forceScale;

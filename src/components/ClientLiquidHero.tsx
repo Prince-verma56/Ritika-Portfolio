@@ -12,6 +12,7 @@ export default function ClientLiquidHero({
   brushRadius,
   dissipation,
   children,
+  showCustomCursor,
 }: {
   imageUrl?: string;
   videoUrl?: string;
@@ -19,6 +20,7 @@ export default function ClientLiquidHero({
   brushRadius?: number;
   dissipation?: number;
   children?: React.ReactNode;
+  showCustomCursor?: boolean;
 }) {
   return (
     <LiquidHero
@@ -27,6 +29,7 @@ export default function ClientLiquidHero({
       strength={strength}
       brushRadius={brushRadius}
       dissipation={dissipation}
+      showCustomCursor={showCustomCursor}
     >
       {children}
     </LiquidHero>

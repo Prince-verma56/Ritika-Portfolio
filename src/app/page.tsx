@@ -8,7 +8,7 @@ export default function Home() {
     <main>
       {/* HERO — swap imageUrl with your own image path inside /public */}
       <ClientLiquidHero
-        imageUrl="https://images.unsplash.com/photo-1564507592333-c60657eea523?q=80&w=2400"
+        imageUrl="/Images/Ritika Landing page image.jpeg"
         strength={0.12}
         brushRadius={0.18}
         dissipation={0.97}
@@ -16,7 +16,7 @@ export default function Home() {
         <div className="pointer-events-auto">
           <span className="text-xs tracking-widest text-neutral-400 uppercase">01 / Portfolio</span>
           <h1 className="mt-3 text-6xl md:text-9xl font-bold text-white leading-none">
-            YOUR<br />NAME
+            Ritika<br />Rawat
           </h1>
           <p className="mt-4 text-neutral-400 text-sm tracking-widest uppercase">
             Developer — Designer — Builder
@@ -30,4 +30,3 @@ export default function Home() {
     </main>
   );
 }
-
