@@ -119,7 +119,8 @@ export default function AboutSection() {
     <section
       ref={sectionRef}
       id="about"
-      className="relative z-20 bg-white text-black pb-40 pt-24 w-full will-change-transform overflow-hidden"
+      // Flipped to dark mode: bg-[#050505] and text-white
+      className="relative z-20 bg-[#050505] text-white pb-40 pt-24 w-full will-change-transform overflow-hidden"
       style={{
         clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)",
       }}
@@ -127,9 +128,10 @@ export default function AboutSection() {
       <div ref={contentRef} className="max-w-[1400px] mx-auto flex flex-col will-change-transform pt-12 md:pt-20">
         
         {/* Top Meta Row */}
-        <div className="px-6 md:px-12 border-b border-black/10 pb-6 mb-16 md:mb-24">
+        {/* Border switched to white/10 */}
+        <div className="px-6 md:px-12 border-b border-white/10 pb-6 mb-16 md:mb-24">
           <div className="overflow-hidden">
-            <div className="mask-reveal-inner flex justify-between items-center text-[10px] md:text-xs font-mono font-bold uppercase tracking-widest">
+            <div className="mask-reveal-inner flex justify-between items-center text-[10px] md:text-xs font-mono font-bold uppercase tracking-widest text-white/50">
               <span>• 02</span>
               <span>[About]</span>
               <span>© 2026</span>
@@ -140,27 +142,27 @@ export default function AboutSection() {
         {/* ── Intro Typography ── */}
         <div className="w-full flex flex-col gap-2 md:gap-4 px-6 md:px-12 lg:pl-[10%]">
           <div className="overflow-hidden pb-2">
-            <h2 className="mask-reveal-inner text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight text-neutral-900">
+            <h2 className="mask-reveal-inner text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight text-white">
               Hi, I'm <span className="text-[#f04e00] font-black">Ritika</span> – a B.Tech AI & Data
             </h2>
           </div>
           <div className="overflow-hidden pb-2">
-            <h2 className="mask-reveal-inner text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight text-neutral-900">
+            <h2 className="mask-reveal-inner text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight text-white">
               Analytics student who ships real things.
             </h2>
           </div>
           <div className="overflow-hidden pb-2 mt-4 md:mt-8">
-            <h2 className="mask-reveal-inner text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-500">
+            <h2 className="mask-reveal-inner text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-400">
               I build across the stack: ML pipelines, 
             </h2>
           </div>
           <div className="overflow-hidden pb-2">
-            <h2 className="mask-reveal-inner text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-500">
+            <h2 className="mask-reveal-inner text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-400">
               mobile apps, IoT dashboards, and
             </h2>
           </div>
           <div className="overflow-hidden pb-2">
-            <h2 className="mask-reveal-inner text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-500">
+            <h2 className="mask-reveal-inner text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-400">
               interfaces people actually want to use.
             </h2>
           </div>
@@ -169,20 +171,21 @@ export default function AboutSection() {
       </div>
 
       {/* ── 3D Tilted Marquee Container ── */}
-      {/* Placed outside the max-w container so it bleeds edge-to-edge */}
+      {/* Container background flipped to dark grey (#0a0a0a) and borders to white/10 */}
       <div
         ref={tiltWrapperRef}
-        className="mt-32 md:mt-48 border-y border-black/10 py-6 md:py-10 bg-neutral-50 flex overflow-hidden select-none will-change-transform shadow-sm"
+        className="mt-32 md:mt-48 border-y border-white/10 py-6 md:py-10 bg-[#0a0a0a] flex overflow-hidden select-none will-change-transform shadow-2xl"
       >
         <div ref={marqueeRef} className="flex whitespace-nowrap gap-12 md:gap-16 will-change-transform pl-12">
           {/* We duplicate the array 3 times so it never runs out of text while scrolling */}
           {[...techStack, ...techStack, ...techStack, ...techStack].map((tech, idx) => (
             <span 
               key={idx} 
-              className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-neutral-900 flex items-center gap-12 md:gap-16"
+              // Marquee text flipped to crisp white
+              className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white flex items-center gap-12 md:gap-16"
             >
               <span>{tech}</span>
-              {/* The tiny orange dot from your screenshot */}
+              {/* The tiny orange dot */}
               <span className="text-xl md:text-3xl text-[#f04e00]">•</span>
             </span>
           ))}

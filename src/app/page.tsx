@@ -4,7 +4,7 @@ import WorkSection from "@/components/sections/WorkSection";
 import AchievementsSection from "@/components/sections/AchievementsSection";
 import Navbar from "@/components/Navbar";
 import HeroContent from "@/components/HeroContent";
-import ContactSection from "@/components/sections/ContactSection";
+import FooterSection from "@/components/sections/FooterSection";
 import ServicesSection from "@/components/sections/ServicesSection";
 
 export default function Home() {
@@ -32,7 +32,7 @@ export default function Home() {
         <ServicesSection />
         <WorkSection />
         <AchievementsSection />
-        <ContactSection />
+        <FooterSection />
 
       </main>
     </>

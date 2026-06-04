@@ -1,5 +1,5 @@
 "use client";
-export default function ContactSection() {
+export default function FooterSection() {
   return (
     <section id="contact" className="bg-[#F04E00] min-h-[80vh] flex flex-col items-center justify-center px-6 text-center border-t border-neutral-900">
       <span className="text-[10px] font-mono tracking-[0.4em] text-neutral-600 uppercase mb-6">// HAVE A PROJECT?</span>

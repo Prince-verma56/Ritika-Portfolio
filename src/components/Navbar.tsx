@@ -1,71 +1,92 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
+gsap.registerPlugin(ScrollTrigger);
+
 const navLinks = [
-  { label: "About",    href: "#about",       num: "01" },
-  { label: "Services", href: "#services",    num: "02" },
-  { label: "Work",     href: "#work",        num: "03" },
-  { label: "Contact",  href: "#contact",     num: "04" },
+  { label: "Home", href: "/" },
+  { label: "Works", href: "/works" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {
-  const navRef = useRef<HTMLElement>(null);
-  const logoRef = useRef<HTMLAnchorElement>(null);
-  const linksRef = useRef<HTMLDivElement>(null);
-  const rightGroupRef = useRef<HTMLDivElement>(null);
-  
-  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-  // Store the timeline so we can play/reverse it on button click
+  const [time, setTime] = useState("");
   const menuTl = useRef<gsap.core.Timeline | null>(null);
 
-  // 1. Initial Entrance Animations
+  // Simple clock for the top right
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      setTime(now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }) + " (IST)");
+    };
+    updateClock();
+    const interval = setInterval(updateClock, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   useGSAP(() => {
+    // ── 1. The Shrinking Logo Effect ──
+    if (isHome) {
+      gsap.to(".nav-logo-text", {
+        fontSize: "24px", // Shrinks to normal logo size on scroll
+        ease: "power2.inOut",
+        scrollTrigger: {
+          trigger: document.body,
+          start: "top top",
+          end: "300px top",
+          scrub: 1,
+        },
+      });
+    }
+
+    // ── 2. Top Right Entrance Animations ──
     gsap.fromTo(
-      logoRef.current,
-      { opacity: 0, x: -24 },
-      { opacity: 1, x: 0, duration: 1, ease: "power3.out", delay: 0.2 }
-    );
-    gsap.fromTo(
-      linksRef.current?.querySelectorAll("a") ?? [],
-      { opacity: 0, y: -12 },
-      { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: "power2.out", delay: 0.4 }
-    );
-    gsap.fromTo(
-      rightGroupRef.current,
-      { opacity: 0, x: 24 },
-      { opacity: 1, x: 0, duration: 0.9, ease: "power3.out", delay: 0.5 }
+      ".nav-top-right > *",
+      { opacity: 0, y: -10 },
+      { opacity: 1, y: 0, duration: 1, stagger: 0.1, ease: "power3.out", delay: 0.5 }
     );
 
-    // 2. Setup Mobile Menu Timeline (Paused by default)
+    // ── 3. Ultra-Smooth Side-Panel Menu Timeline ──
     menuTl.current = gsap.timeline({ paused: true })
-      .to(".mobile-menu-overlay", {
-        autoAlpha: 1, // Handles both opacity and visibility
-        duration: 0.5,
-        ease: "power3.inOut",
+      // Fade in the left-side blur backdrop
+      .to(".menu-backdrop", {
+        autoAlpha: 1,
+        duration: 0.6,
+        ease: "power2.inOut",
       })
-      .fromTo(
-        ".mobile-link",
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.1, duration: 0.6, ease: "power3.out" },
-        "-=0.2"
+      // Slide in the right-side solid panel smoothly
+      .to(".menu-panel", {
+        x: "0%",
+        duration: 0.8,
+        ease: "expo.inOut",
+      }, "<")
+      // Premium text reveal: sliding up with a slight un-rotate
+      .fromTo(".menu-link-item",
+        { y: 60, opacity: 0, rotateZ: 3 },
+        { y: 0, opacity: 1, rotateZ: 0, stagger: 0.08, duration: 0.8, ease: "power4.out" },
+        "-=0.4"
       )
-      .fromTo(
-        ".mobile-meta",
-        { opacity: 0 },
-        { opacity: 1, duration: 0.4 },
-        "-=0.2"
+      // Fade in the bottom meta data (Roles & Socials)
+      .fromTo(".menu-meta",
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, stagger: 0.1, duration: 0.6, ease: "power3.out" },
+        "-=0.5"
       );
-  }, { scope: navRef, dependencies: [] });
+  }, { dependencies: [isHome] });
 
-  // 3. Play or Reverse Menu Timeline on State Change
+  // Play/Reverse menu and lock scrolling
   useEffect(() => {
     if (isMenuOpen) {
       menuTl.current?.play();
-      // Prevent body scroll when menu is open
       document.body.style.overflow = "hidden";
     } else {
       menuTl.current?.reverse();
@@ -73,108 +94,140 @@ export default function Navbar() {
     }
   }, [isMenuOpen]);
 
-  // Scroll detection for background blur
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
-    <nav
-      ref={navRef}
-      className="fixed top-0 inset-x-0 z-[9999] transition-all duration-500"
-    >
-      {/* ── Main Top Bar ── */}
-      <div 
-        className="relative z-50 flex items-center justify-between px-6 md:px-10 h-20 md:h-24 transition-colors duration-500"
-        style={{
-          background: scrolled || isMenuOpen ? "rgba(0,0,0,0.85)" : "transparent",
-          backdropFilter: scrolled || isMenuOpen ? "blur(12px)" : "none",
-          borderBottom: scrolled && !isMenuOpen ? "1px solid rgba(255,255,255,0.06)" : "1px solid transparent",
-        }}
-      >
-        {/* Logo */}
-        <a
-          ref={logoRef}
-          href="#"
-          onClick={() => setIsMenuOpen(false)}
-          className="flex items-center gap-2 select-none"
-          style={{ opacity: 0 }}
-        >
-          <span className="text-white font-black text-lg md:text-xl uppercase tracking-wider leading-none">
-            RITIKA<span className="text-[#f04e00]">®</span>
-          </span>
-        </a>
+    <>
+      {/* ── Main Top Bar (Fixed Header) ── */}
+      <header className="fixed top-0 left-0 w-full z-[9000] pointer-events-none px-6 md:px-10 pt-8 md:pt-10 flex justify-between items-start">
 
-        {/* Center Desktop Links */}
-        <div ref={linksRef} className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="nav-link relative flex items-start gap-1 text-white/70 hover:text-white text-xs uppercase tracking-[0.18em] font-medium transition-colors duration-300"
-            >
-              <sup className="text-[#f04e00] text-[8px] font-bold leading-none mt-0.5">
-                {link.num}
-              </sup>
-              {link.label}
-            </a>
-          ))}
+        {/* Massive Shrinking Logo (Top Left) */}
+        {/* max-w-[70vw] ensures it truncates nicely on mobile without breaking layout */}
+        <div className="pointer-events-auto min-w-0 max-w-[80vw] md:max-w-none shrink">
+          <Link 
+            href="/" 
+            className={`nav-logo-text font-black uppercase text-white leading-[0.8] tracking-tighter origin-top-left transition-colors hover:text-white/80 whitespace-nowrap block will-change-auto ${
+              isHome 
+                ? "text-[20vw] sm:text-[14vw] md:text-[11vw]" 
+                : "text-2xl md:text-3xl"
+            }`}
+          >
+            RITIKA<sup className="text-[clamp(10px,2vw,1.5rem)] font-bold align-super ml-1 md:ml-2">®</sup>
+          </Link>
         </div>
 
-        {/* Right Group: Status Pill & Mobile Menu Toggle */}
-        <div ref={rightGroupRef} className="flex items-center gap-4" style={{ opacity: 0 }}>
-          
-          {/* Availability Pill (Hidden on very small screens to save space) */}
-          <div className="hidden sm:flex items-center gap-2 border border-white/10 rounded-full px-4 py-2 bg-white/5">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-[10px] text-white/80 uppercase tracking-widest font-medium">
-              Available
-            </span>
+        {/* Right Navigation Group */}
+        {/* FIXED: Added 'absolute right-6 md:static' so on mobile it is pinned to the right edge and NEVER pushed away by the logo */}
+        <div className="nav-top-right absolute right-6 top-8 md:static md:right-auto md:top-auto flex items-start gap-6 md:gap-12 pointer-events-auto shrink-0">
+
+          {/* Availability (Hidden on Mobile) */}
+          <div className="hidden lg:flex flex-col gap-1 text-right">
+            <div className="flex items-center justify-end gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-white text-[10px] uppercase font-bold tracking-widest">Available for project</span>
+            </div>
+            <span className="text-white/50 text-[9px] uppercase tracking-widest font-mono">Early Feb 2026</span>
           </div>
 
-          {/* Mobile Hamburger Button */}
+          {/* Local Time (Hidden on Mobile) */}
+          <div className="hidden md:flex flex-col gap-1 text-right">
+            <span className="text-white text-[10px] uppercase font-bold tracking-widest">{time || "Loading..."}</span>
+            <span className="text-white/50 text-[9px] uppercase tracking-widest font-mono">Local Time</span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-4">
+            <Link href="/contact" className="hidden sm:flex items-center justify-center border border-white/20 hover:border-white/50 bg-white/5 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-widest px-6 py-2.5 rounded-full transition-all duration-300">
+              Let's Talk
+            </Link>
+
+            {/* Hamburger Toggle - Explicit cursor-pointer */}
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className="flex flex-col justify-center items-center w-10 h-10 md:w-12 md:h-12 gap-1.5 border border-white/20 hover:border-white/50 bg-[#050505]/50 backdrop-blur-md rounded-full transition-all duration-300 cursor-pointer shadow-lg"
+              aria-label="Open Menu"
+            >
+              <span className="w-4 md:w-5 h-px bg-white block" />
+              <span className="w-4 md:w-5 h-px bg-white block" />
+            </button>
+          </div>
+
+        </div>
+      </header>
+
+      {/* ── Left Side: Blurred Backdrop ── */}
+      <div
+        className="menu-backdrop fixed inset-0 w-full h-screen bg-black/60 backdrop-blur-md z-[9998] invisible opacity-0 cursor-pointer"
+        onClick={() => setIsMenuOpen(false)}
+      />
+
+      {/* ── Right Side: Solid Sliding Menu Panel ── */}
+      <div
+        className="menu-panel fixed top-0 right-0 w-full md:w-1/2 lg:w-[40%] h-screen bg-[#070707] z-[9999] translate-x-full flex flex-col justify-between p-6 md:p-12 border-l border-white/5 shadow-2xl"
+      >
+        {/* Top Row inside Menu */}
+        <div className="flex justify-between items-center w-full">
+          <div className="menu-meta flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-[#f04e00]" />
+            <span className="text-white/50 text-[10px] font-mono tracking-widest uppercase">Menu</span>
+          </div>
+
+          {/* Explicit cursor-pointer added */}
           <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden flex flex-col items-center justify-center w-10 h-10 gap-1.5 bg-white/5 border border-white/10 rounded-full"
-            aria-label="Toggle Menu"
+            onClick={() => setIsMenuOpen(false)}
+            className="w-12 h-12 flex items-center justify-center border border-white/10 hover:border-white/40 rounded-full transition-colors group cursor-pointer bg-white/5"
+            aria-label="Close Menu"
           >
-            <span className={`block w-4 h-[1px] bg-white transition-transform duration-300 ${isMenuOpen ? "translate-y-[3.5px] rotate-45" : ""}`} />
-            <span className={`block w-4 h-[1px] bg-white transition-transform duration-300 ${isMenuOpen ? "-translate-y-[3.5px] -rotate-45" : ""}`} />
+            <span className="text-white/50 group-hover:text-white transition-colors text-sm font-light">✕</span>
           </button>
         </div>
-      </div>
 
-      {/* ── Mobile Fullscreen Menu Overlay ── */}
-      <div 
-        className="mobile-menu-overlay invisible opacity-0 fixed inset-0 w-full h-screen bg-[#050505] z-40 flex flex-col justify-center px-6 pt-20"
-      >
-        <div className="flex flex-col gap-8">
+        {/* Links */}
+        <div className="flex flex-col gap-2 mt-16 md:mt-20">
           {navLinks.map((link) => (
-            <div key={link.href} className="overflow-hidden">
-              <a
+            <div key={link.label} className="overflow-hidden">
+              <Link
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className="mobile-link flex items-start gap-4 text-white text-5xl font-black uppercase tracking-tighter"
+                className="menu-link-item group flex items-center gap-4 text-white text-[clamp(3.5rem,9vw,5rem)] font-black uppercase tracking-tighter leading-none hover:pl-4 transition-all duration-300 cursor-pointer"
               >
-                <span className="text-[#f04e00] text-sm font-mono mt-1">{link.num}</span>
                 {link.label}
-              </a>
+                <span className="w-2 h-2 md:w-3 md:h-3 bg-[#f04e00] opacity-0 group-hover:opacity-100 transition-opacity rounded-sm" />
+              </Link>
             </div>
           ))}
         </div>
 
-        {/* Mobile Menu Footer Meta */}
-        <div className="mobile-meta absolute bottom-12 left-6 flex flex-col gap-2">
-          <span className="text-white/40 text-[10px] font-mono uppercase tracking-widest">
-            Based in India
-          </span>
-          <span className="text-white/40 text-[10px] font-mono uppercase tracking-widest">
-            Open for freelance opportunities
-          </span>
+        {/* ── Bottom Footer Info (UPDATED TO MATCH YOUR REQUEST) ── */}
+        <div className="grid grid-cols-2 gap-6 mt-auto pt-12 border-t border-white/5">
+
+          {/* Bottom Left Aligned: Roles */}
+          <div className="menu-meta flex flex-col gap-4">
+            <span className="text-white/40 text-[10px] font-mono tracking-widest uppercase">(Roles)</span>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-white/90 text-sm md:text-base font-bold tracking-wide">Designer</span>
+              <span className="text-white/90 text-sm md:text-base font-bold tracking-wide">Developer</span>
+              <span className="text-white/90 text-sm md:text-base font-bold tracking-wide">ML Engineer</span>
+            </div>
+          </div>
+
+          {/* Bottom Right Aligned: Contact & Socials */}
+          <div className="menu-meta flex flex-col gap-4 items-end text-right">
+            <span className="text-white/40 text-[10px] font-mono tracking-widest uppercase">(Connect)</span>
+            <div className="flex flex-col gap-3 items-end">
+              <a href="mailto:hello@ritika.com" className="text-[#f04e00] text-sm md:text-base font-bold hover:opacity-80 transition-opacity cursor-pointer">
+                hello@ritika.com
+              </a>
+              <div className="flex flex-col gap-1.5 items-end">
+                {["X/Twitter", "LinkedIn", "GitHub"].map((social) => (
+                  <Link key={social} href="/contact" className="text-white/70 text-xs md:text-sm hover:text-white transition-colors flex items-center gap-1 group cursor-pointer">
+                    <span className="opacity-0 group-hover:opacity-100 group-hover:-translate-x-1 transition-all text-[10px]">↗</span> {social}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-    </nav>
+    </>
   );
 }
