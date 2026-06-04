@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -12,163 +13,247 @@ const projects = [
     title: "Adhayaya",
     subtitle: "Indian Heritage & Travel Platform",
     tags: ["Next.js", "WebGL", "Travel"],
-    image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1800&q=90",
     link: "#",
+    year: "2024",
   },
   {
     id: "02",
     title: "Dhritam",
     subtitle: "AI-Powered Health Monitoring",
     tags: ["Python", "TensorFlow", "IoT"],
-    image: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1800&q=90",
     link: "#",
+    year: "2024",
   },
   {
     id: "03",
     title: "Hazu",
     subtitle: "Predictive Analytics Dashboard",
     tags: ["React", "D3.js", "ML"],
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1800&q=90",
     link: "#",
+    year: "2023",
   },
 ];
 
-const allTitles = projects.map((p) => p.title);
-
 export default function WorkSection() {
-  const sectionRef  = useRef<HTMLElement>(null);
-  const titleRef    = useRef<HTMLHeadingElement>(null);
-  const itemRefs    = useRef<(HTMLDivElement | null)[]>([]);
+  const sectionRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  useEffect(() => {
-    // Animate section title
-    if (titleRef.current) {
-      gsap.fromTo(
-        titleRef.current,
-        { opacity: 0, x: -80 },
-        {
-          opacity: 1, x: 0, duration: 1, ease: "power3.out",
-          scrollTrigger: { trigger: titleRef.current, start: "top 85%" },
+  useGSAP(() => {
+    // 1. Section Clip-Path (Slant -> Flat)
+    gsap.fromTo(
+      sectionRef.current,
+      { clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)" },
+      {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "top top",
+          scrub: 1,
         }
-      );
-    }
+      }
+    );
 
-    // Animate each project row
+    // 2. Parallax: Content sliding up smoothly inside the slanted sheet
+    gsap.fromTo(
+      contentRef.current,
+      { y: 150 },
+      {
+        y: 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "top 15%",
+          scrub: 1.5,
+        },
+      }
+    );
+
+    // 3. Main Title Mask Reveal
+    gsap.fromTo(
+      ".mask-title",
+      { y: "110%", opacity: 0 },
+      {
+        y: "0%",
+        opacity: 1,
+        duration: 1.5,
+        ease: "power4.out",
+        scrollTrigger: {
+          trigger: ".mask-title-wrapper",
+          start: "top 85%",
+        },
+      }
+    );
+
+    // 4. Per-Project Timeline Animations
     itemRefs.current.forEach((item) => {
       if (!item) return;
-      const number = item.querySelector(".project-number");
-      const names  = item.querySelectorAll(".project-name");
-      const card   = item.querySelector(".project-card");
 
-      gsap.fromTo(
-        number,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1, y: 0, duration: 0.8, delay: 0.1,
-          ease: "power3.out",
-          scrollTrigger: { trigger: item, start: "top 80%" },
-        }
-      );
-      gsap.fromTo(
-        names,
-        { opacity: 0, x: -30 },
-        {
-          opacity: 1, x: 0, duration: 0.7, stagger: 0.08, delay: 0.2,
-          ease: "power2.out",
-          scrollTrigger: { trigger: item, start: "top 80%" },
-        }
-      );
-      gsap.fromTo(
-        card,
-        { opacity: 0, x: 100, scale: 0.96 },
-        {
-          opacity: 1, x: 0, scale: 1, duration: 1, delay: 0.1,
-          ease: "power3.out",
-          scrollTrigger: { trigger: item, start: "top 75%" },
-        }
-      );
+      const maskedTexts = item.querySelectorAll(".mask-text");
+      const menuItems = item.querySelectorAll(".menu-item");
+      const imgWrap = item.querySelector(".img-wrap");
+      const imgInner = item.querySelector(".img-inner");
+
+      // Setup initial states
+      gsap.set(imgWrap, { clipPath: "inset(100% 0 0 0)" });
+      gsap.set(maskedTexts, { y: "110%", opacity: 0 });
+      gsap.set(menuItems, { opacity: 0, x: -20 });
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: item,
+          start: "top 75%",
+        },
+      });
+
+      // Orchestrate the reveal sequence
+      tl.to(imgWrap, { clipPath: "inset(0% 0 0 0)", duration: 1.5, ease: "power3.inOut" })
+        .to(maskedTexts, { y: "0%", opacity: 1, duration: 1.2, stagger: 0.1, ease: "power4.out" }, "-=1")
+        .to(menuItems, { opacity: 1, x: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" }, "-=0.8");
+
+      // Independent scroll scrub for inner image parallax
+      if (imgInner) {
+        gsap.fromTo(
+          imgInner,
+          { yPercent: -15 },
+          {
+            yPercent: 15,
+            ease: "none",
+            scrollTrigger: {
+              trigger: imgWrap,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          }
+        );
+      }
     });
-  }, []);
+
+  }, { scope: sectionRef, dependencies: [] });
 
   return (
-    <section ref={sectionRef} id="work" className="bg-black py-24 px-6 md:px-12 overflow-hidden">
+    <section
+      ref={sectionRef}
+      id="work"
+      className="relative z-30 bg-[#050505] py-32 px-6 md:px-16 overflow-hidden w-full will-change-transform"
+      style={{
+        clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)",
+      }}
+    >
+      <div ref={contentRef} className="max-w-[1400px] mx-auto flex flex-col will-change-transform">
 
-      {/* Section heading */}
-      <h2
-        ref={titleRef}
-        className="text-[clamp(2.5rem,10vw,7rem)] font-black uppercase text-[#f04e00] leading-none tracking-tight mb-20 opacity-0"
-      >
-        LATEST WORK.
-      </h2>
+        {/* Mask Reveal Wrapper for Title */}
+        <div className="mask-title-wrapper overflow-hidden pb-4 mb-24 md:mb-40">
+          <h2 className="mask-title text-[clamp(4rem,12vw,9rem)] font-black uppercase text-[#f04e00] leading-[0.85] tracking-tighter">
+            LATEST WORK.
+          </h2>
+        </div>
 
-      {/* Project rows */}
-      <div className="flex flex-col gap-20">
-        {projects.map((project, i) => (
-          <div
-            key={project.id}
-            ref={(el) => { itemRefs.current[i] = el; }}
-            className="grid grid-cols-2 md:grid-cols-[1fr_2fr] gap-8 items-center border-t border-neutral-800 pt-8"
-          >
-            {/* Left: number + project name list */}
-            <div>
-              <span className="project-number block text-[clamp(3rem,8vw,6rem)] font-black text-white leading-none mb-4 opacity-0">
-                {project.id}.
-              </span>
-              <div className="flex flex-col gap-1">
-                {allTitles.map((name, j) => (
-                  <span
-                    key={j}
-                    className={`project-name text-sm md:text-base opacity-0 transition-colors ${
-                      name === project.title
-                        ? "text-white font-semibold border-l-2 border-[#f04e00] pl-3"
-                        : "text-neutral-600 pl-3"
-                    }`}
-                  >
-                    {name}
+        <div className="flex flex-col gap-32 md:gap-48">
+          {projects.map((project, index) => (
+            <div
+              key={project.id}
+              ref={(el) => { itemRefs.current[index] = el; }}
+              className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-12 lg:gap-24 items-start"
+            >
+
+              {/* ── Left Side: Sticky Navigation Index ── */}
+              <div className="flex flex-col gap-10 lg:sticky lg:top-40 pt-4">
+
+                {/* Giant Number Mask Reveal */}
+                <div className="overflow-hidden pb-2">
+                  <span className="mask-text block text-[clamp(5rem,8vw,7rem)] font-black text-white leading-none tracking-tighter">
+                    {project.id}.
                   </span>
-                ))}
-              </div>
-            </div>
+                </div>
 
-            {/* Right: image card */}
-            <div className="project-card relative group overflow-hidden opacity-0">
-              <div className="relative aspect-[16/9] overflow-hidden rounded-sm">
-                <Image
-                  src={project.image}
-                  alt={project.title}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 60vw"
-                />
-                {/* Overlay on hover */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-500" />
-                {/* View Project button */}
-                <a
-                  href={project.link}
-                  className="absolute bottom-4 right-4 bg-white text-black text-xs font-bold uppercase tracking-widest px-4 py-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 flex items-center gap-1 pointer-events-auto"
-                >
-                  View Project ↗
-                </a>
-              </div>
-              {/* Project subtitle + tags */}
-              <div className="mt-3 flex items-center justify-between">
-                <span className="text-xs text-neutral-500 uppercase tracking-widest">
-                  {project.subtitle}
-                </span>
-                <div className="flex gap-2">
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-[10px] text-neutral-600 border border-neutral-800 px-2 py-0.5 uppercase tracking-wider"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                {/* The List of Projects (Styled like the screenshot) */}
+                <div className="flex flex-col gap-6 pt-4">
+                  {projects.map((p) => {
+                    const isActive = p.id === project.id;
+                    return (
+                      <div key={p.id} className="menu-item flex items-center gap-6 group cursor-default">
+                        {/* Dynamic Line */}
+                        <div
+                          className={`h-[2px] transition-all duration-500 ease-out ${
+                            isActive ? "w-16 bg-white" : "w-8 bg-neutral-800"
+                          }`}
+                        />
+                        {/* Dynamic Text */}
+                        <span
+                          className={`text-lg md:text-xl transition-all duration-500 tracking-wide ${
+                            isActive 
+                              ? "text-white font-bold underline decoration-2 underline-offset-[6px] decoration-white/30" 
+                              : "text-neutral-500 font-medium"
+                          }`}
+                        >
+                          {p.title}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
+
+              {/* ── Right Side: Media & Meta ── */}
+              <div className="flex flex-col w-full">
+
+                {/* Top Meta Data (Replaces "Frame 3") */}
+                <div className="overflow-hidden mb-6 flex justify-between items-end">
+                  <div className="flex flex-col gap-1">
+                    <span className="mask-text text-neutral-500 font-mono text-xs uppercase tracking-widest">
+                      Year — {project.year}
+                    </span>
+                    <span className="mask-text text-white/80 text-sm md:text-base font-light tracking-wide">
+                      {project.subtitle}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Image Reveal (Unrolls bottom-to-top) */}
+                <div className="img-wrap relative w-full aspect-[4/3] md:aspect-[16/10] overflow-hidden rounded-md group bg-neutral-900">
+                  <div className="img-inner absolute inset-0 -top-[15%] h-[130%] w-full">
+                    <Image
+                      src={project.image}
+                      alt={project.title}
+                      fill
+                      className="object-cover opacity-90 transition-transform duration-700 group-hover:scale-105"
+                      sizes="(max-width: 1024px) 100vw, 70vw"
+                      priority={index === 0}
+                    />
+                  </div>
+
+                  {/* Glassmorphic View Project Button (Positioned Bottom Left) */}
+                  <a
+                    href={project.link}
+                    className="absolute bottom-6 left-6 md:bottom-8 md:left-8 flex items-center gap-3 bg-black/40 hover:bg-black/70 backdrop-blur-md border border-white/10 text-white text-xs md:text-sm font-semibold px-6 py-3 rounded-md transition-all duration-300 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0"
+                  >
+                    View Project <span className="text-lg leading-none">↗</span>
+                  </a>
+                </div>
+
+                {/* Bottom Tags (Kept minimalistic so it doesn't clutter the UI) */}
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {project.tags.map((tag) => (
+                    <div key={tag} className="overflow-hidden">
+                      <span className="mask-text block text-[10px] text-neutral-500 border border-neutral-800 px-3 py-1.5 uppercase tracking-widest font-mono rounded-sm">
+                        {tag}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

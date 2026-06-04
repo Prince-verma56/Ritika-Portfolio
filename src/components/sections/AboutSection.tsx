@@ -1,123 +1,192 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Matched perfectly to your screenshot
 const techStack = [
-  "Python", "JavaScript", "TypeScript", "React", "Next.js",
-  "HTML", "CSS", "Java", "Node.js", "TensorFlow", "MongoDB",
-  "Flutter", "Arduino", "SQL", "Tailwind",
+  "NEXT.JS", "TENSORFLOW", "MONGODB", "TAILWIND", "GSAP", "REACT", "PYTHON", "FIGMA"
 ];
 
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const dividerRef = useRef<HTMLDivElement>(null);
-  const nameRef    = useScrollReveal<HTMLHeadingElement>({ type: "clip", duration: 1.1 });
-  const bioRef     = useScrollReveal<HTMLParagraphElement>({ type: "up",   delay: 0.2 });
-  const taglineRef = useScrollReveal<HTMLDivElement>({ type: "up",   delay: 0.1, duration: 1 });
+  const contentRef = useRef<HTMLDivElement>(null);
+  const tiltWrapperRef = useRef<HTMLDivElement>(null);
+  const marqueeRef = useRef<HTMLDivElement>(null);
 
-  // Parallax diagonal divider
-  useEffect(() => {
-    const divider = dividerRef.current;
-    if (!divider) return;
-    const tween = gsap.to(divider, {
-      yPercent: -12,
-      ease: "none",
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top bottom",
-        end: "bottom top",
-        scrub: 1.5,
-      },
+  useGSAP(() => {
+    // 1. Section Clip-Path (Slant -> Flat)
+    gsap.fromTo(
+      sectionRef.current,
+      { clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)" },
+      {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "top top", 
+          scrub: 1,
+        }
+      }
+    );
+
+    // 2. Parallax: Content sliding up
+    gsap.fromTo(
+      contentRef.current,
+      { y: 200 },
+      {
+        y: 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "top 10%", 
+          scrub: 1.5,
+        },
+      }
+    );
+
+    // 3. Modern "Mask" Text Reveal for Intro
+    const textElements = gsap.utils.toArray(".mask-reveal-inner");
+    textElements.forEach((el: any) => {
+      gsap.fromTo(
+        el,
+        { y: "120%", opacity: 0, rotate: 2 }, 
+        {
+          y: "0%",
+          opacity: 1, 
+          rotate: 0,
+          duration: 1.2,
+          ease: "expo.out",
+          scrollTrigger: {
+            trigger: el.parentElement, 
+            start: "top 85%",
+          }
+        }
+      );
     });
-    return () => tween.kill();
-  }, []);
 
-  const doubled = [...techStack, ...techStack];
+    // 4. 3D Tilted Marquee Container
+    if (tiltWrapperRef.current) {
+      gsap.set(tiltWrapperRef.current, {
+        transformPerspective: 1200,
+        transformOrigin: "50% 50%", 
+      });
+
+      gsap.fromTo(
+        tiltWrapperRef.current,
+        {
+          rotationY: 12,    // Swung backward initially
+          rotationZ: 3,     // Tilted downward slightly
+          skewX: 3          // Sleek shear angle
+        },
+        {
+          rotationY: -10,   // Swings forward on scroll
+          rotationZ: -3,    // Lifts up dynamically
+          skewX: -2,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1,
+          }
+        }
+      );
+    }
+
+    // 5. Horizontal Marquee Track Speed
+    if (marqueeRef.current) {
+      gsap.to(marqueeRef.current, {
+        xPercent: -35, // Scrubs the text sideways as you scroll down
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.5,
+        }
+      });
+    }
+
+  }, { scope: sectionRef, dependencies: [] });
 
   return (
-    <section ref={sectionRef} id="about" className="relative bg-black overflow-hidden">
-
-      {/* ── Diagonal orange divider from Hero ── */}
-      <div
-        ref={dividerRef}
-        className="absolute top-0 left-0 w-full h-40 bg-[#f04e00] origin-top will-change-transform"
-        style={{ clipPath: "polygon(0 0, 100% 0, 100% 40%, 0 100%)" }}
-      />
-
-      {/* ── Main content ── */}
-      <div className="relative z-10 px-6 md:px-12 pt-48 pb-0">
-
-        {/* Available badge */}
-        <div className="flex items-center gap-2 mb-6">
-          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-xs tracking-widest text-green-400 uppercase font-medium">
-            Available for Projects
-          </span>
-        </div>
-
-        {/* Giant name */}
-        <h2
-          ref={nameRef}
-          className="text-[clamp(3.5rem,14vw,11rem)] font-black uppercase leading-none tracking-tighter text-white"
-          style={{ fontFamily: "var(--font-space)" }}
-        >
-          RITIKA<br />RAWAT
-        </h2>
-
-        {/* Tagline */}
-        <div ref={taglineRef} className="mt-4 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
-          <span className="text-xs tracking-widest text-neutral-400 uppercase">(About)</span>
-          <p className="text-sm md:text-base text-neutral-300 font-light italic max-w-xs text-right hidden md:block">
-            Beyond Visuals.<br />Build with VISION.
-          </p>
-        </div>
-
-        {/* Bio text */}
-        <p
-          ref={bioRef}
-          className="mt-8 text-lg md:text-xl text-white leading-relaxed max-w-2xl font-light"
-        >
-          Hi, I'm{" "}
-          <span className="text-[#f04e00] font-semibold">Ritika</span>
-          {" "}— a B.Tech AI & Data Analytics student who ships real things.{" "}
-          <br className="hidden md:block" />
-          I build across the stack: ML pipelines, mobile apps, IoT dashboards,
-          <br className="hidden md:block" />
-          and interfaces people actually want to use.
-        </p>
-      </div>
-
-      {/* ── TechStack Marquee strip ── */}
-      <div className="relative mt-20 bg-[#f04e00] py-5 overflow-hidden">
-        {/* Diagonal cut top */}
-        <div
-          className="absolute -top-6 left-0 w-full h-8 bg-black"
-          style={{ clipPath: "polygon(0 0, 100% 100%, 100% 0)" }}
-        />
-
-        <div className="flex overflow-hidden">
-          <div className="marquee-track">
-            {doubled.map((tech, i) => (
-              <span
-                key={i}
-                className="inline-flex items-center gap-6 px-6 text-black font-black text-sm md:text-base uppercase tracking-widest whitespace-nowrap"
-              >
-                {tech}
-                <span className="text-black/40 text-lg">✦</span>
-              </span>
-            ))}
+    <section
+      ref={sectionRef}
+      id="about"
+      className="relative z-20 bg-white text-black pb-40 pt-24 w-full will-change-transform overflow-hidden"
+      style={{
+        clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)",
+      }}
+    >
+      <div ref={contentRef} className="max-w-[1400px] mx-auto flex flex-col will-change-transform pt-12 md:pt-20">
+        
+        {/* Top Meta Row */}
+        <div className="px-6 md:px-12 border-b border-black/10 pb-6 mb-16 md:mb-24">
+          <div className="overflow-hidden">
+            <div className="mask-reveal-inner flex justify-between items-center text-[10px] md:text-xs font-mono font-bold uppercase tracking-widest">
+              <span>• 02</span>
+              <span>[About]</span>
+              <span>© 2026</span>
+            </div>
           </div>
         </div>
 
-        {/* Diagonal cut bottom */}
-        <div
-          className="absolute -bottom-6 left-0 w-full h-8 bg-black"
-          style={{ clipPath: "polygon(0 100%, 100% 0, 0 0)" }}
-        />
+        {/* ── Intro Typography ── */}
+        <div className="w-full flex flex-col gap-2 md:gap-4 px-6 md:px-12 lg:pl-[10%]">
+          <div className="overflow-hidden pb-2">
+            <h2 className="mask-reveal-inner text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight text-neutral-900">
+              Hi, I'm <span className="text-[#f04e00] font-black">Ritika</span> – a B.Tech AI & Data
+            </h2>
+          </div>
+          <div className="overflow-hidden pb-2">
+            <h2 className="mask-reveal-inner text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight text-neutral-900">
+              Analytics student who ships real things.
+            </h2>
+          </div>
+          <div className="overflow-hidden pb-2 mt-4 md:mt-8">
+            <h2 className="mask-reveal-inner text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-500">
+              I build across the stack: ML pipelines, 
+            </h2>
+          </div>
+          <div className="overflow-hidden pb-2">
+            <h2 className="mask-reveal-inner text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-500">
+              mobile apps, IoT dashboards, and
+            </h2>
+          </div>
+          <div className="overflow-hidden pb-2">
+            <h2 className="mask-reveal-inner text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-500">
+              interfaces people actually want to use.
+            </h2>
+          </div>
+        </div>
+
+      </div>
+
+      {/* ── 3D Tilted Marquee Container ── */}
+      {/* Placed outside the max-w container so it bleeds edge-to-edge */}
+      <div
+        ref={tiltWrapperRef}
+        className="mt-32 md:mt-48 border-y border-black/10 py-6 md:py-10 bg-neutral-50 flex overflow-hidden select-none will-change-transform shadow-sm"
+      >
+        <div ref={marqueeRef} className="flex whitespace-nowrap gap-12 md:gap-16 will-change-transform pl-12">
+          {/* We duplicate the array 3 times so it never runs out of text while scrolling */}
+          {[...techStack, ...techStack, ...techStack, ...techStack].map((tech, idx) => (
+            <span 
+              key={idx} 
+              className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-neutral-900 flex items-center gap-12 md:gap-16"
+            >
+              <span>{tech}</span>
+              {/* The tiny orange dot from your screenshot */}
+              <span className="text-xl md:text-3xl text-[#f04e00]">•</span>
+            </span>
+          ))}
+        </div>
       </div>
 
     </section>

@@ -105,13 +105,15 @@ export default function LiquidHero({
       loadedTexture.generateMipmaps = true;
       loadedTexture.needsUpdate = true;
 
-      // Update image dimensions in shader uniforms
-      if (material.uniforms.uImageResolution) {
-        material.uniforms.uImageResolution.value.set(
-          loadedTexture.image.width,
-          loadedTexture.image.height
-        );
-      }
+      // Defer updating image dimensions in shader uniforms to prevent ReferenceError if load runs synchronously
+      setTimeout(() => {
+        if (materialRef.current?.uniforms?.uImageResolution) {
+          materialRef.current.uniforms.uImageResolution.value.set(
+            loadedTexture.image.width,
+            loadedTexture.image.height
+          );
+        }
+      }, 0);
     });
 
     const vertexShader = `

@@ -1,11 +1,14 @@
+"use client";
 export default function ContactSection() {
   return (
-    <section id="contact" className="min-h-screen flex flex-col items-center justify-center px-8 bg-black text-center">
-      <span className="text-xs tracking-widest text-neutral-500 uppercase">04 / Contact</span>
-      <h2 className="mt-4 text-5xl md:text-8xl font-bold text-white">Let's talk.</h2>
+    <section id="contact" className="bg-[#F04E00] min-h-[80vh] flex flex-col items-center justify-center px-6 text-center border-t border-neutral-900">
+      <span className="text-[10px] font-mono tracking-[0.4em] text-neutral-600 uppercase mb-6">// HAVE A PROJECT?</span>
+      <h2 className="text-[clamp(3.5rem,12vw,8rem)] font-black uppercase text-white leading-none tracking-tighter mb-12">
+        LET'S WORK <br />TOGETHER.
+      </h2>
       <a
         href="mailto:hello@yourportfolio.dev"
-        className="mt-10 inline-block border border-white text-white px-8 py-4 text-sm tracking-widest uppercase hover:bg-white hover:text-black transition-colors"
+        className="text-lg md:text-2xl font-medium text-white border-b border-white/20 pb-2 hover:text-[#f04e00] hover:border-[#f04e00] transition-colors duration-300"
       >
         hello@yourportfolio.dev
       </a>
