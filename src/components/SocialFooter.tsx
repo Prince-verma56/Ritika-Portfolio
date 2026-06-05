@@ -1,16 +1,57 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Link from "next/link";
 import Image from "next/image"; // Next.js Image component added
 import ButtonWithIcon from "./ButtonWithIcon"; 
+import SlideTextButton from "./kokonutui/slide-text-button"; 
+import { toast } from "sonner";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function SocialFooter() {
   const footerRef = useRef<HTMLElement>(null);
+  const [email, setEmail] = useState("");
+  const [botField, setBotField] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const emailTrimmed = email.trim();
+    if (!emailTrimmed) {
+      toast.error("Email is required.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailTrimmed)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const loadingToastId = toast.loading("Subscribing...");
+
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailTrimmed, botField }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success("Subscribed successfully!", { id: loadingToastId });
+        setEmail("");
+      } else {
+        toast.error(data.message || "Failed to subscribe.", { id: loadingToastId });
+      }
+    } catch (err) {
+      toast.error("Failed to subscribe. Please try again.", { id: loadingToastId });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useGSAP(() => {
     // Reveal animation for footer elements when scrolling into view
@@ -110,10 +151,36 @@ export default function SocialFooter() {
           <div className="flex flex-col gap-4">
              <span className="text-white/40 text-[10px] font-mono uppercase tracking-widest mb-2">(Newsletter)</span>
              <p className="text-white/60 text-sm">Sign up for latest insights and updates.</p>
-             <div className="flex border-b border-white/20 pb-2 mt-2">
-               <input type="email" placeholder="Enter email address" className="bg-transparent w-full text-sm outline-none placeholder:text-white/30" />
-               <button className="text-[10px] font-bold tracking-widest uppercase hover:text-[#f04e00] transition-colors">Subscribe</button>
-             </div>
+             <form onSubmit={handleSubscribe} className="w-full">
+               <input
+                 type="text"
+                 name="botField"
+                 value={botField}
+                 onChange={(e) => setBotField(e.target.value)}
+                 className="hidden"
+                 tabIndex={-1}
+                 autoComplete="off"
+               />
+               <div className="flex border-b border-white/20 pb-2 mt-2">
+                 <input 
+                   type="email" 
+                   value={email}
+                   onChange={(e) => setEmail(e.target.value)}
+                   disabled={isSubmitting}
+                   placeholder="Enter email address" 
+                   className="bg-transparent w-full text-sm outline-none placeholder:text-white/30 text-white disabled:opacity-50" 
+                 />
+                 <SlideTextButton
+                   type="submit"
+                   variant="custom"
+                   text={isSubmitting ? "..." : "Subscribe"}
+                   hoverText={isSubmitting ? "..." : "Subscribe"}
+                   animateEntrance={false}
+                   disabled={isSubmitting}
+                   className="text-[10px] font-bold tracking-widest uppercase hover:text-[#f04e00] transition-colors bg-transparent border-none p-0 text-white cursor-pointer disabled:opacity-50"
+                 />
+               </div>
+             </form>
           </div>
 
         </div>

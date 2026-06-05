@@ -6,6 +6,8 @@ import Navbar from "@/components/Navbar";
 import Preloader from "@/components/Preloader";
 import { LoaderProvider } from "@/context/LoaderContext";
 import { cn } from "@/lib/utils";
+import { Toaster } from "sonner";
+import "sonner/dist/styles.css";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -32,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Preloader />
           <Navbar />
           <ClientSmoothScroller>{children}</ClientSmoothScroller>
+          <Toaster theme="dark" position="bottom-right" richColors />
         </LoaderProvider>
       </body>
     </html>

@@ -7,10 +7,10 @@ import Link from "next/link";
 import Accordion from "../Accordion";
 import { useLoader } from "@/context/LoaderContext";
 
-// SHADCN UI IMPORTS (Adjust these paths to match your project structure)
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import SlideTextButton from "@/components/kokonutui/slide-text-button";
+import { toast } from "sonner";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -50,6 +50,81 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
   const [activeFaq, setActiveFaq] = useState<number | null>(0); 
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const { isLoaderFinished } = useLoader();
+
+  // ── FORM STATE & VALIDATION ──
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [botField, setBotField] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Frontend validations
+    const nameTrimmed = formData.name.trim();
+    const emailTrimmed = formData.email.trim();
+    const messageTrimmed = formData.message.trim();
+
+    if (!nameTrimmed) {
+      toast.error("Name is required.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailTrimmed || !emailRegex.test(emailTrimmed)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    if (!messageTrimmed) {
+      toast.error("Message is required.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const loadingToastId = toast.loading("Sending your message...");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: nameTrimmed,
+          email: emailTrimmed,
+          message: messageTrimmed,
+          botField: botField,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        toast.success(data.message || "Message sent successfully!", {
+          id: loadingToastId,
+        });
+        // Clear input values
+        setFormData({ name: "", email: "", message: "" });
+        setBotField("");
+      } else {
+        toast.error(data.message || "Failed to send message.", {
+          id: loadingToastId,
+        });
+      }
+    } catch (err) {
+      console.error("Contact Form Submission Error:", err);
+      toast.error("An unexpected error occurred. Please try again.", {
+        id: loadingToastId,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useGSAP(() => {
     // ── 1. ALWAYS RUN INITIAL STATES IMMEDIATELY (UNCONDITIONAL) ──
@@ -182,14 +257,28 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
           <div ref={formRef} className="flex flex-col gap-10 items-end w-full">
             
             {/* The Form Panel */}
-            <div className="w-full bg-[#0a0a0a] border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col gap-6">
+            <form onSubmit={handleSubmit} className="w-full bg-[#0a0a0a] border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col gap-6">
+              {/* Spam Honeypot Field */}
+              <input
+                type="text"
+                name="botField"
+                value={botField}
+                onChange={(e) => setBotField(e.target.value)}
+                style={{ display: "none" }}
+                tabIndex={-1}
+                autoComplete="off"
+              />
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="form-element opacity-0 translate-y-[30px]">
                   <Input 
                     type="text" 
                     placeholder="Enter your name" 
                     id="name" 
-                    className="h-14 bg-[#111] border-white/5 text-white placeholder:text-white/30 rounded-xl focus-visible:ring-1 focus-visible:ring-[#f04e00] focus-visible:border-transparent transition-all duration-300" 
+                    value={formData.name}
+                    onChange={handleChange}
+                    disabled={isSubmitting}
+                    className="h-14 bg-[#111] border-white/5 text-white placeholder:text-white/30 rounded-xl focus-visible:ring-1 focus-visible:ring-[#f04e00] focus-visible:border-transparent transition-all duration-300 disabled:opacity-50" 
                   />
                 </div>
                 <div className="form-element opacity-0 translate-y-[30px]">
@@ -197,7 +286,10 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
                     type="email" 
                     placeholder="Email" 
                     id="email" 
-                    className="h-14 bg-[#111] border-white/5 text-white placeholder:text-white/30 rounded-xl focus-visible:ring-1 focus-visible:ring-[#f04e00] focus-visible:border-transparent transition-all duration-300" 
+                    value={formData.email}
+                    onChange={handleChange}
+                    disabled={isSubmitting}
+                    className="h-14 bg-[#111] border-white/5 text-white placeholder:text-white/30 rounded-xl focus-visible:ring-1 focus-visible:ring-[#f04e00] focus-visible:border-transparent transition-all duration-300 disabled:opacity-50" 
                   />
                 </div>
               </div>
@@ -205,8 +297,11 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
                 <Textarea 
                   placeholder="Message" 
                   id="message" 
+                  value={formData.message}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
                   rows={5} 
-                  className="resize-none bg-[#111] border-white/5 text-white placeholder:text-white/30 rounded-xl focus-visible:ring-1 focus-visible:ring-[#f04e00] focus-visible:border-transparent p-4 transition-all duration-300" 
+                  className="resize-none bg-[#111] border-white/5 text-white placeholder:text-white/30 rounded-xl focus-visible:ring-1 focus-visible:ring-[#f04e00] focus-visible:border-transparent p-4 transition-all duration-300 disabled:opacity-50" 
                 />
               </div>
               
@@ -214,15 +309,20 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
                 <p className="text-white/50 text-[10px] max-w-sm font-mono tracking-wide leading-relaxed">
                   By submitting you agree to our <Link href="/terms" className="text-white hover:text-[#f04e00] transition-colors">Terms of Service</Link> and <Link href="/privacy" className="text-white hover:text-[#f04e00] transition-colors">Privacy Policy</Link>
                 </p>
-                <Button 
-                  className="relative group flex items-center justify-center gap-3 bg-[#f04e00] hover:bg-[#ff5a1a] text-white px-10 h-14 rounded-full shadow-2xl shadow-[#f04e00]/20 transition-all duration-300 overflow-hidden cursor-pointer"
-                >
-                  <span className="text-sm font-extrabold uppercase tracking-widest relative z-10">Subscribe</span>
-                  <span className="text-xl relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
+                <div className="group relative w-fit flex-shrink-0">
+                  <SlideTextButton 
+                    type="submit"
+                    variant="custom"
+                    text={isSubmitting ? "Sending..." : "Subscribe"}
+                    hoverText={isSubmitting ? "Sending..." : "Subscribe ↗"}
+                    animateEntrance={false}
+                    disabled={isSubmitting}
+                    className="relative flex items-center justify-center gap-3 bg-[#f04e00] hover:bg-[#ff5a1a] text-white px-10 h-14 rounded-full shadow-2xl shadow-[#f04e00]/20 transition-all duration-300 pointer-events-auto text-sm font-extrabold uppercase tracking-widest leading-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
                   <div className="absolute inset-0 border border-white/20 rounded-full scale-[1.05] pointer-events-none" />
-                </Button>
+                </div>
               </div>
-            </div>
+            </form>
 
             {/* Book a Call CTA */}
             <p className="text-white text-base md:text-lg font-medium form-element opacity-0 translate-y-[30px]">

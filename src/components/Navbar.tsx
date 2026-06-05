@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useLoader } from "@/context/LoaderContext";
+import SlideTextButton from "@/components/kokonutui/slide-text-button";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -18,6 +20,7 @@ const navLinks = [
 export default function Navbar() {
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const { isLoaderFinished } = useLoader();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [time, setTime] = useState("");
   const menuTl = useRef<gsap.core.Timeline | null>(null);
@@ -41,32 +44,49 @@ export default function Navbar() {
       oldTrigger.kill();
     }
 
-    // ── 1. The Shrinking Logo Effect ──
-    if (isHome) {
+    if (isLoaderFinished) {
+      // ── 1. The Shrinking Logo Effect ──
+      if (isHome) {
+        gsap.to(".nav-logo-text", {
+          fontSize: "24px", // Shrinks to normal logo size on scroll
+          ease: "power2.inOut",
+          scrollTrigger: {
+            id: "logo-shrink",
+            trigger: document.body,
+            start: "top top",
+            end: "300px top",
+            scrub: 1,
+          },
+        });
+      } else {
+        // Clear inline style so Tailwind class controls the font size
+        gsap.set(".nav-logo-text", { clearProps: "all" });
+      }
+
+      // ── 2. Logo Entrance Animation ──
       gsap.to(".nav-logo-text", {
-        fontSize: "24px", // Shrinks to normal logo size on scroll
-        ease: "power2.inOut",
-        scrollTrigger: {
-          id: "logo-shrink",
-          trigger: document.body,
-          start: "top top",
-          end: "300px top",
-          scrub: 1,
-        },
+        opacity: 1,
+        y: 0,
+        duration: 1.2,
+        ease: "elastic.out(1,1)",
+      });
+
+      // ── 3. Top Right Entrance Animations ──
+      gsap.to(".nav-top-right > *", {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        stagger: 0.1,
+        ease: "power3.out",
+        delay: 0.2, // Small delay after loader finishes to stagger with the logo
       });
     } else {
-      // Clear inline style so Tailwind class controls the font size
-      gsap.set(".nav-logo-text", { clearProps: "all" });
+      // Hide elements initially while loader is active
+      gsap.set(".nav-logo-text", { opacity: 0, y: isHome ? 40 : 15 });
+      gsap.set(".nav-top-right > *", { opacity: 0, y: -10 });
     }
 
-    // ── 2. Top Right Entrance Animations ──
-    gsap.fromTo(
-      ".nav-top-right > *",
-      { opacity: 0, y: -10 },
-      { opacity: 1, y: 0, duration: 1, stagger: 0.1, ease: "power3.out", delay: 0.5 }
-    );
-
-    // ── 3. Ultra-Smooth Side-Panel Menu Timeline ──
+    // ── 4. Ultra-Smooth Side-Panel Menu Timeline ──
     menuTl.current = gsap.timeline({ paused: true })
       // Fade in the left-side blur backdrop
       .to(".menu-backdrop", {
@@ -92,7 +112,7 @@ export default function Navbar() {
         { opacity: 1, y: 0, stagger: 0.1, duration: 0.6, ease: "power3.out" },
         "-=0.5"
       );
-  }, { scope: containerRef, dependencies: [pathname] });
+  }, { scope: containerRef, dependencies: [pathname, isLoaderFinished] });
 
   // Play/Reverse menu and lock scrolling
   useEffect(() => {
@@ -113,8 +133,8 @@ export default function Navbar() {
         {/* Massive Shrinking Logo (Top Left) */}
         {/* max-w-[70vw] ensures it truncates nicely on mobile without breaking layout */}
         <div className="pointer-events-auto min-w-0 max-w-[80vw] md:max-w-none shrink">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className={"nav-logo-text font-black uppercase text-white whitespace-nowrap block " + (isHome ? "text-[20vw] sm:text-[14vw] md:text-[11vw] origin-top-left will-change-auto leading-[0.8] tracking-tighter transition-colors hover:text-white/80" : "text-2xl md:text-3xl tracking-tighter hover:text-white/80 transition-colors")}
           >
             RITIKA<sup className="text-[clamp(10px,2vw,1.5rem)] font-bold align-super ml-1 md:ml-2">®</sup>
@@ -142,9 +162,14 @@ export default function Navbar() {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-4">
-            <Link href="/contact" className="hidden sm:flex items-center justify-center border border-white/20 hover:border-white/50 bg-white/5 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-widest px-6 py-2.5 rounded-full transition-all duration-300">
-              Let's Talk
-            </Link>
+            <SlideTextButton
+              variant="custom"
+              text="Let's Talk"
+              hoverText="Let's Talk ↗"
+              href="/contact"
+              animateEntrance={false}
+              className="hidden sm:flex items-center justify-center border border-white/20 hover:border-white/50 bg-white/5 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-widest px-6 py-2.5 rounded-full transition-all duration-300"
+            />
 
             {/* Hamburger Toggle - Explicit cursor-pointer */}
             <button
