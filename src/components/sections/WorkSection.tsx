@@ -4,9 +4,12 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
+import Link from "next/link"; // Imported Next.js Link
+import { FollowerPointerCard } from "../FollowerPointerCard"; // Adjust path as needed
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Updated with proper internal routing links
 const projects = [
   {
     id: "01",
@@ -14,7 +17,7 @@ const projects = [
     subtitle: "Indian Heritage & Travel Platform",
     tags: ["Next.js", "WebGL", "Travel"],
     image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1800&q=90",
-    link: "#",
+    link: "/works/adhayaya", 
     year: "2024",
   },
   {
@@ -23,7 +26,7 @@ const projects = [
     subtitle: "AI-Powered Health Monitoring",
     tags: ["Python", "TensorFlow", "IoT"],
     image: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1800&q=90",
-    link: "#",
+    link: "/works/dhritam",
     year: "2024",
   },
   {
@@ -32,48 +35,54 @@ const projects = [
     subtitle: "Predictive Analytics Dashboard",
     tags: ["React", "D3.js", "ML"],
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1800&q=90",
-    link: "#",
+    link: "/works/hazu",
     year: "2023",
   },
 ];
 
-export default function WorkSection() {
+interface WorkSectionProps {
+  isStandalonePage?: boolean;
+}
+
+export default function WorkSection({ isStandalonePage = false }: WorkSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useGSAP(() => {
-    // 1. Section Clip-Path (Slant -> Flat)
-    gsap.fromTo(
-      sectionRef.current,
-      { clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)" },
-      {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "top top",
-          scrub: 1,
+    // 1. Section Clip-Path (Slant -> Flat) - Only on scroll page
+    if (!isStandalonePage) {
+      gsap.fromTo(
+        sectionRef.current,
+        { clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)" },
+        {
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "top top",
+            scrub: 1,
+          }
         }
-      }
-    );
+      );
 
-    // 2. Parallax: Content sliding up smoothly inside the slanted sheet
-    gsap.fromTo(
-      contentRef.current,
-      { y: 150 },
-      {
-        y: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "top 15%",
-          scrub: 1.5,
-        },
-      }
-    );
+      // 2. Parallax: Content sliding up smoothly
+      gsap.fromTo(
+        contentRef.current,
+        { y: 150 },
+        {
+          y: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "top 15%",
+            scrub: 1.5,
+          },
+        }
+      );
+    }
 
     // 3. Main Title Mask Reveal
     gsap.fromTo(
@@ -100,7 +109,6 @@ export default function WorkSection() {
       const imgWrap = item.querySelector(".img-wrap");
       const imgInner = item.querySelector(".img-inner");
 
-      // Setup initial states
       gsap.set(imgWrap, { clipPath: "inset(100% 0 0 0)" });
       gsap.set(maskedTexts, { y: "110%", opacity: 0 });
       gsap.set(menuItems, { opacity: 0, x: -20 });
@@ -112,12 +120,10 @@ export default function WorkSection() {
         },
       });
 
-      // Orchestrate the reveal sequence
       tl.to(imgWrap, { clipPath: "inset(0% 0 0 0)", duration: 1.5, ease: "power3.inOut" })
         .to(maskedTexts, { y: "0%", opacity: 1, duration: 1.2, stagger: 0.1, ease: "power4.out" }, "-=1")
         .to(menuItems, { opacity: 1, x: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" }, "-=0.8");
 
-      // Independent scroll scrub for inner image parallax
       if (imgInner) {
         gsap.fromTo(
           imgInner,
@@ -136,20 +142,21 @@ export default function WorkSection() {
       }
     });
 
-  }, { scope: sectionRef, dependencies: [] });
+  }, { scope: sectionRef, dependencies: [isStandalonePage] });
 
   return (
     <section
       ref={sectionRef}
       id="work"
-      className="relative z-30 bg-[#050505] py-32 px-6 md:px-16 overflow-hidden w-full will-change-transform"
-      style={{
+      className={`relative z-30 bg-[#050505] px-6 md:px-16 overflow-hidden w-full will-change-transform ${
+        isStandalonePage ? "pt-8 pb-32" : "py-32"
+      }`}
+      style={isStandalonePage ? {} : {
         clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)",
       }}
     >
       <div ref={contentRef} className="max-w-[1400px] mx-auto flex flex-col will-change-transform">
 
-        {/* Mask Reveal Wrapper for Title */}
         <div className="mask-title-wrapper overflow-hidden pb-4 mb-24 md:mb-40">
           <h2 className="mask-title text-[clamp(4rem,12vw,9rem)] font-black uppercase text-[#f04e00] leading-[0.85] tracking-tighter">
             LATEST WORK.
@@ -164,29 +171,24 @@ export default function WorkSection() {
               className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-12 lg:gap-24 items-start"
             >
 
-              {/* ── Left Side: Sticky Navigation Index ── */}
+              {/* Left Side: Sticky Navigation Index */}
               <div className="flex flex-col gap-10 lg:sticky lg:top-40 pt-4">
-
-                {/* Giant Number Mask Reveal */}
                 <div className="overflow-hidden pb-2">
                   <span className="mask-text block text-[clamp(5rem,8vw,7rem)] font-black text-white leading-none tracking-tighter">
                     {project.id}.
                   </span>
                 </div>
 
-                {/* The List of Projects (Styled like the screenshot) */}
                 <div className="flex flex-col gap-6 pt-4">
                   {projects.map((p) => {
                     const isActive = p.id === project.id;
                     return (
                       <div key={p.id} className="menu-item flex items-center gap-6 group cursor-default">
-                        {/* Dynamic Line */}
                         <div
                           className={`h-[2px] transition-all duration-500 ease-out ${
                             isActive ? "w-16 bg-white" : "w-8 bg-neutral-800"
                           }`}
                         />
-                        {/* Dynamic Text */}
                         <span
                           className={`text-lg md:text-xl transition-all duration-500 tracking-wide ${
                             isActive 
@@ -202,10 +204,9 @@ export default function WorkSection() {
                 </div>
               </div>
 
-              {/* ── Right Side: Media & Meta ── */}
+              {/* Right Side: Media & Meta */}
               <div className="flex flex-col w-full">
 
-                {/* Top Meta Data (Replaces "Frame 3") */}
                 <div className="overflow-hidden mb-6 flex justify-between items-end">
                   <div className="flex flex-col gap-1">
                     <span className="mask-text text-neutral-500 font-mono text-xs uppercase tracking-widest">
@@ -217,29 +218,25 @@ export default function WorkSection() {
                   </div>
                 </div>
 
-                {/* Image Reveal (Unrolls bottom-to-top) */}
-                <div className="img-wrap relative w-full aspect-[4/3] md:aspect-[16/10] overflow-hidden rounded-md group bg-neutral-900">
-                  <div className="img-inner absolute inset-0 -top-[15%] h-[130%] w-full">
-                    <Image
-                      src={project.image}
-                      alt={project.title}
-                      fill
-                      className="object-cover opacity-90 transition-transform duration-700 group-hover:scale-105"
-                      sizes="(max-width: 1024px) 100vw, 70vw"
-                      priority={index === 0}
-                    />
-                  </div>
+                {/* ── UPDATED: Wrapped with Next.js <Link> & Custom Follower ── */}
+                <Link href={project.link} className="block w-full">
+                  <FollowerPointerCard title="View Project" className="w-full">
+                    <div className="img-wrap relative w-full aspect-[4/3] md:aspect-[16/10] overflow-hidden rounded-md group bg-neutral-900">
+                      <div className="img-inner absolute inset-0 -top-[15%] h-[130%] w-full">
+                        <Image
+                          src={project.image}
+                          alt={project.title}
+                          fill
+                          className="object-cover opacity-90 transition-transform duration-700 group-hover:scale-105"
+                          sizes="(max-width: 1024px) 100vw, 70vw"
+                          priority={index === 0}
+                        />
+                      </div>
+                    </div>
+                  </FollowerPointerCard>
+                </Link>
 
-                  {/* Glassmorphic View Project Button (Positioned Bottom Left) */}
-                  <a
-                    href={project.link}
-                    className="absolute bottom-6 left-6 md:bottom-8 md:left-8 flex items-center gap-3 bg-black/40 hover:bg-black/70 backdrop-blur-md border border-white/10 text-white text-xs md:text-sm font-semibold px-6 py-3 rounded-md transition-all duration-300 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0"
-                  >
-                    View Project <span className="text-lg leading-none">↗</span>
-                  </a>
-                </div>
-
-                {/* Bottom Tags (Kept minimalistic so it doesn't clutter the UI) */}
+                {/* Bottom Tags */}
                 <div className="mt-6 flex flex-wrap gap-2">
                   {project.tags.map((tag) => (
                     <div key={tag} className="overflow-hidden">

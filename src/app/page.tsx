@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import HeroContent from "@/components/HeroContent";
 import FooterSection from "@/components/sections/FooterSection";
 import ServicesSection from "@/components/sections/ServicesSection";
+import SocialFooter from "@/components/SocialFooter";
 
 export default function Home() {
   return (
@@ -32,6 +33,7 @@ export default function Home() {
         <ServicesSection />
         <WorkSection />
         <AchievementsSection />
+         <SocialFooter />
         <FooterSection />
 
       </main>

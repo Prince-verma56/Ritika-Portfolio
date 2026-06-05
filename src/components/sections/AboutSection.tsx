@@ -11,7 +11,11 @@ const techStack = [
   "NEXT.JS", "TENSORFLOW", "MONGODB", "TAILWIND", "GSAP", "REACT", "PYTHON", "FIGMA"
 ];
 
-export default function AboutSection() {
+interface AboutSectionProps {
+  isStandalonePage?: boolean;
+}
+
+export default function AboutSection({ isStandalonePage = false }: AboutSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const tiltWrapperRef = useRef<HTMLDivElement>(null);
@@ -19,36 +23,39 @@ export default function AboutSection() {
 
   useGSAP(() => {
     // 1. Section Clip-Path (Slant -> Flat)
-    gsap.fromTo(
-      sectionRef.current,
-      { clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)" },
-      {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "top top", 
-          scrub: 1,
+    // 1. Section Clip-Path (Slant -> Flat) - Only on scroll page
+    if (!isStandalonePage) {
+      gsap.fromTo(
+        sectionRef.current,
+        { clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)" },
+        {
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "top top", 
+            scrub: 1,
+          }
         }
-      }
-    );
+      );
 
-    // 2. Parallax: Content sliding up
-    gsap.fromTo(
-      contentRef.current,
-      { y: 200 },
-      {
-        y: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "top 10%", 
-          scrub: 1.5,
-        },
-      }
-    );
+      // 2. Parallax: Content sliding up
+      gsap.fromTo(
+        contentRef.current,
+        { y: 200 },
+        {
+          y: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "top 10%", 
+            scrub: 1.5,
+          },
+        }
+      );
+    }
 
     // 3. Modern "Mask" Text Reveal for Intro
     const textElements = gsap.utils.toArray(".mask-reveal-inner");
@@ -113,19 +120,25 @@ export default function AboutSection() {
       });
     }
 
-  }, { scope: sectionRef, dependencies: [] });
+  }, { scope: sectionRef, dependencies: [isStandalonePage] });
 
   return (
     <section
       ref={sectionRef}
       id="about"
-      // Flipped to dark mode: bg-[#050505] and text-white
-      className="relative z-20 bg-[#050505] text-white pb-40 pt-24 w-full will-change-transform overflow-hidden"
-      style={{
+      className={`relative z-20 bg-[#050505] text-white pb-40 w-full will-change-transform overflow-hidden ${
+        isStandalonePage ? "pt-8" : "pt-24"
+      }`}
+      style={isStandalonePage ? {} : {
         clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)",
       }}
     >
-      <div ref={contentRef} className="max-w-[1400px] mx-auto flex flex-col will-change-transform pt-12 md:pt-20">
+      <div 
+        ref={contentRef} 
+        className={`max-w-[1400px] mx-auto flex flex-col will-change-transform ${
+          isStandalonePage ? "pt-0" : "pt-12 md:pt-20"
+        }`}
+      >
         
         {/* Top Meta Row */}
         {/* Border switched to white/10 */}

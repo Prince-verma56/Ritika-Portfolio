@@ -36,7 +36,11 @@ const faqs = [
   },
 ];
 
-export default function ContactSection() {
+interface ContactSectionProps {
+  isStandalonePage?: boolean;
+}
+
+export default function ContactSection({ isStandalonePage = false }: ContactSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const titleMaskRef = useRef<HTMLDivElement>(null);
@@ -45,37 +49,39 @@ export default function ContactSection() {
   const [activeFaq, setActiveFaq] = useState<number | null>(0); 
 
   useGSAP(() => {
-    // ── 1. The Slanted Sheet Reveal (Parallax Effect) ──
-    gsap.fromTo(
-      sectionRef.current,
-      { clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)" },
-      {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "top top",
-          scrub: 1,
+    // ── 1. The Slanted Sheet Reveal (Parallax Effect) - Only on scroll page
+    if (!isStandalonePage) {
+      gsap.fromTo(
+        sectionRef.current,
+        { clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)" },
+        {
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "top top",
+            scrub: 1,
+          }
         }
-      }
-    );
+      );
 
-    // ── 2. Content sliding up inside the sheet ──
-    gsap.fromTo(
-      contentRef.current,
-      { y: 150 },
-      {
-        y: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "top 20%",
-          scrub: 1.5,
-        },
-      }
-    );
+      // ── 2. Content sliding up inside the sheet ──
+      gsap.fromTo(
+        contentRef.current,
+        { y: 150 },
+        {
+          y: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "top 20%",
+            scrub: 1.5,
+          },
+        }
+      );
+    }
 
     // ── 3. Initial Setup for Reveals ──
     gsap.set(".mask-line", { y: "110%", opacity: 0 });
@@ -111,17 +117,16 @@ export default function ContactSection() {
       opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power2.out" 
     }, "-=0.6");
 
-  }, { scope: sectionRef });
+  }, { scope: sectionRef, dependencies: [isStandalonePage] });
 
   return (
     <section
       ref={sectionRef}
       id="contact"
-      // THE FIX: -mt-16 md:-mt-24 pulls this section UP and OVER the previous section.
-      // Combined with z-30, the clip-path slant now reveals the previous section instead of a black void!
-      // pt-32 md:pt-48 ensures the content is pushed down safely past the slant.
-      className="relative z-30 bg-[#050505] text-white -mt-16 md:-mt-24 pt-32 md:pt-48 pb-16 px-6 md:px-12 lg:px-20 overflow-hidden w-full will-change-transform"
-      style={{
+      className={`relative z-30 bg-[#050505] text-white pb-16 px-6 md:px-12 lg:px-20 overflow-hidden w-full will-change-transform ${
+        isStandalonePage ? "pt-8" : "-mt-16 md:-mt-24 pt-32 md:pt-48"
+      }`}
+      style={isStandalonePage ? {} : {
         clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)",
       }}
     >
