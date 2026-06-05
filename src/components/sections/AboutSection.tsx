@@ -1,8 +1,9 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useLoader } from "@/context/LoaderContext";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,10 +21,20 @@ export default function AboutSection({ isStandalonePage = false }: AboutSectionP
   const contentRef = useRef<HTMLDivElement>(null);
   const tiltWrapperRef = useRef<HTMLDivElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const { isLoaderFinished } = useLoader();
 
   useGSAP(() => {
-    // 1. Section Clip-Path (Slant -> Flat)
-    // 1. Section Clip-Path (Slant -> Flat) - Only on scroll page
+    // 1. ALWAYS RUN INITIAL STATES IMMEDIATELY (UNCONDITIONAL)
+    gsap.set(".mask-reveal-inner", { y: "120%", opacity: 0, rotate: 2 });
+    if (tiltWrapperRef.current) {
+      gsap.set(tiltWrapperRef.current, {
+        transformPerspective: 1200,
+        transformOrigin: "50% 50%", 
+      });
+    }
+
+    // 2. Section Clip-Path (Slant -> Flat) - Only on scroll page
     if (!isStandalonePage) {
       gsap.fromTo(
         sectionRef.current,
@@ -40,7 +51,7 @@ export default function AboutSection({ isStandalonePage = false }: AboutSectionP
         }
       );
 
-      // 2. Parallax: Content sliding up
+      // Parallax: Content sliding up
       gsap.fromTo(
         contentRef.current,
         { y: 200 },
@@ -59,11 +70,20 @@ export default function AboutSection({ isStandalonePage = false }: AboutSectionP
 
     // 3. Modern "Mask" Text Reveal for Intro
     const textElements = gsap.utils.toArray(".mask-reveal-inner");
-    textElements.forEach((el: any) => {
-      gsap.fromTo(
-        el,
-        { y: "120%", opacity: 0, rotate: 2 }, 
-        {
+    if (isStandalonePage) {
+      const tl = gsap.timeline({ paused: true });
+      tl.to(textElements, {
+        y: "0%",
+        opacity: 1, 
+        rotate: 0,
+        duration: 1.2,
+        stagger: 0.1,
+        ease: "expo.out"
+      });
+      tlRef.current = tl;
+    } else {
+      textElements.forEach((el: any) => {
+        gsap.to(el, {
           y: "0%",
           opacity: 1, 
           rotate: 0,
@@ -73,17 +93,12 @@ export default function AboutSection({ isStandalonePage = false }: AboutSectionP
             trigger: el.parentElement, 
             start: "top 85%",
           }
-        }
-      );
-    });
+        });
+      });
+    }
 
     // 4. 3D Tilted Marquee Container
     if (tiltWrapperRef.current) {
-      gsap.set(tiltWrapperRef.current, {
-        transformPerspective: 1200,
-        transformOrigin: "50% 50%", 
-      });
-
       gsap.fromTo(
         tiltWrapperRef.current,
         {
@@ -122,6 +137,20 @@ export default function AboutSection({ isStandalonePage = false }: AboutSectionP
 
   }, { scope: sectionRef, dependencies: [isStandalonePage] });
 
+  // 6. Play the timeline and refresh ScrollTriggers when loader finishes
+  useEffect(() => {
+    if (isLoaderFinished) {
+      if (isStandalonePage && tlRef.current) {
+        tlRef.current.play();
+      }
+      ScrollTrigger.refresh();
+    } else {
+      if (isStandalonePage && tlRef.current) {
+        tlRef.current.progress(0).pause();
+      }
+    }
+  }, [isLoaderFinished, isStandalonePage]);
+
   return (
     <section
       ref={sectionRef}
@@ -144,7 +173,7 @@ export default function AboutSection({ isStandalonePage = false }: AboutSectionP
         {/* Border switched to white/10 */}
         <div className="px-6 md:px-12 border-b border-white/10 pb-6 mb-16 md:mb-24">
           <div className="overflow-hidden">
-            <div className="mask-reveal-inner flex justify-between items-center text-[10px] md:text-xs font-mono font-bold uppercase tracking-widest text-white/50">
+            <div className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 flex justify-between items-center text-[10px] md:text-xs font-mono font-bold uppercase tracking-widest text-white/50">
               <span>• 02</span>
               <span>[About]</span>
               <span>© 2026</span>
@@ -155,27 +184,27 @@ export default function AboutSection({ isStandalonePage = false }: AboutSectionP
         {/* ── Intro Typography ── */}
         <div className="w-full flex flex-col gap-2 md:gap-4 px-6 md:px-12 lg:pl-[10%]">
           <div className="overflow-hidden pb-2">
-            <h2 className="mask-reveal-inner text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight text-white">
+            <h2 className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight text-white">
               Hi, I'm <span className="text-[#f04e00] font-black">Ritika</span> – a B.Tech AI & Data
             </h2>
           </div>
           <div className="overflow-hidden pb-2">
-            <h2 className="mask-reveal-inner text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight text-white">
+            <h2 className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight text-white">
               Analytics student who ships real things.
             </h2>
           </div>
           <div className="overflow-hidden pb-2 mt-4 md:mt-8">
-            <h2 className="mask-reveal-inner text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-400">
+            <h2 className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-400">
               I build across the stack: ML pipelines, 
             </h2>
           </div>
           <div className="overflow-hidden pb-2">
-            <h2 className="mask-reveal-inner text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-400">
+            <h2 className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-400">
               mobile apps, IoT dashboards, and
             </h2>
           </div>
           <div className="overflow-hidden pb-2">
-            <h2 className="mask-reveal-inner text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-400">
+            <h2 className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-400">
               interfaces people actually want to use.
             </h2>
           </div>

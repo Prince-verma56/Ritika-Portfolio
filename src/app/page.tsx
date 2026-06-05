@@ -2,7 +2,6 @@ import ClientLiquidHero from "@/components/ClientLiquidHero";
 import AboutSection from "@/components/sections/AboutSection";
 import WorkSection from "@/components/sections/WorkSection";
 import AchievementsSection from "@/components/sections/AchievementsSection";
-import Navbar from "@/components/Navbar";
 import HeroContent from "@/components/HeroContent";
 import FooterSection from "@/components/sections/FooterSection";
 import ServicesSection from "@/components/sections/ServicesSection";
@@ -11,9 +10,6 @@ import SocialFooter from "@/components/SocialFooter";
 export default function Home() {
   return (
     <>
-      {/* ── Fixed Navbar ── */}
-      <Navbar />
-
       <main className="bg-black">
 
         {/* ════════════════════════════════

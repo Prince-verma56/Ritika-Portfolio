@@ -1,10 +1,11 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Link from "next/link";
 import Accordion from "../Accordion";
+import { useLoader } from "@/context/LoaderContext";
 
 // SHADCN UI IMPORTS (Adjust these paths to match your project structure)
 import { Input } from "@/components/ui/input";
@@ -47,9 +48,15 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
   const faqMaskRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const [activeFaq, setActiveFaq] = useState<number | null>(0); 
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const { isLoaderFinished } = useLoader();
 
   useGSAP(() => {
-    // ── 1. The Slanted Sheet Reveal (Parallax Effect) - Only on scroll page
+    // ── 1. ALWAYS RUN INITIAL STATES IMMEDIATELY (UNCONDITIONAL) ──
+    gsap.set(".mask-line", { y: "110%", opacity: 0 });
+    gsap.set([".fade-in", ".faq-item", ".form-element"], { opacity: 0, y: 30 });
+
+    // ── 2. The Slanted Sheet Reveal (Parallax Effect) - Only on scroll page
     if (!isStandalonePage) {
       gsap.fromTo(
         sectionRef.current,
@@ -66,7 +73,7 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
         }
       );
 
-      // ── 2. Content sliding up inside the sheet ──
+      // ── 3. Content sliding up inside the sheet ──
       gsap.fromTo(
         contentRef.current,
         { y: 150 },
@@ -83,16 +90,7 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
       );
     }
 
-    // ── 3. Initial Setup for Reveals ──
-    gsap.set(".mask-line", { y: "110%", opacity: 0 });
-    gsap.set([".fade-in", ".faq-item", ".form-element"], { opacity: 0, y: 30 });
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top 60%", 
-      },
-    });
+    const tl = gsap.timeline({ paused: true });
 
     // ── 4. Sequence Animations ──
     tl.to(titleMaskRef.current?.querySelectorAll(".mask-line") ?? [], { 
@@ -117,7 +115,31 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
       opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power2.out" 
     }, "-=0.6");
 
+    tlRef.current = tl;
+
+    if (!isStandalonePage) {
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: "top 60%", 
+        onEnter: () => tl.play()
+      });
+    }
+
   }, { scope: sectionRef, dependencies: [isStandalonePage] });
+
+  // ── 5. Play timelines and refresh ScrollTriggers when loader finishes ──
+  useEffect(() => {
+    if (isLoaderFinished) {
+      if (isStandalonePage && tlRef.current) {
+        tlRef.current.play();
+      }
+      ScrollTrigger.refresh();
+    } else {
+      if (isStandalonePage && tlRef.current) {
+        tlRef.current.progress(0).pause();
+      }
+    }
+  }, [isLoaderFinished, isStandalonePage]);
 
   return (
     <section
@@ -140,18 +162,18 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
           <div className="flex flex-col gap-10">
             <div className="main-title-mask" ref={titleMaskRef}>
               <div className="overflow-hidden pb-1">
-                <span className="block text-white/50 font-mono text-xs uppercase tracking-widest leading-none mask-line">
+                <span className="block text-white/50 font-mono text-xs uppercase tracking-widest leading-none mask-line translate-y-[110%] opacity-0">
                   (CONTACT US)
                 </span>
               </div>
               <div className="overflow-hidden pb-2 mt-4">
-                <h2 className="mask-line text-[clamp(4rem,10vw,8.5rem)] font-black uppercase text-white leading-[0.85] tracking-tighter">
+                <h2 className="mask-line translate-y-[110%] opacity-0 text-[clamp(4rem,10vw,8.5rem)] font-black uppercase text-white leading-[0.85] tracking-tighter">
                   Let’s Work <br /> Together
                 </h2>
               </div>
             </div>
             
-            <p className="text-white/80 text-lg md:text-xl font-medium leading-relaxed max-w-xl fade-in pt-6">
+            <p className="text-white/80 text-lg md:text-xl font-medium leading-relaxed max-w-xl fade-in opacity-0 translate-y-[30px] pt-6">
               Have a project in mind? We'd love to hear about it. Let’s create something great together!
             </p>
           </div>
@@ -162,7 +184,7 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
             {/* The Form Panel */}
             <div className="w-full bg-[#0a0a0a] border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="form-element">
+                <div className="form-element opacity-0 translate-y-[30px]">
                   <Input 
                     type="text" 
                     placeholder="Enter your name" 
@@ -170,7 +192,7 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
                     className="h-14 bg-[#111] border-white/5 text-white placeholder:text-white/30 rounded-xl focus-visible:ring-1 focus-visible:ring-[#f04e00] focus-visible:border-transparent transition-all duration-300" 
                   />
                 </div>
-                <div className="form-element">
+                <div className="form-element opacity-0 translate-y-[30px]">
                   <Input 
                     type="email" 
                     placeholder="Email" 
@@ -179,7 +201,7 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
                   />
                 </div>
               </div>
-              <div className="form-element">
+              <div className="form-element opacity-0 translate-y-[30px]">
                 <Textarea 
                   placeholder="Message" 
                   id="message" 
@@ -188,7 +210,7 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
                 />
               </div>
               
-              <div className="form-element flex flex-col md:flex-row md:justify-between md:items-center gap-6 mt-2">
+              <div className="form-element opacity-0 translate-y-[30px] flex flex-col md:flex-row md:justify-between md:items-center gap-6 mt-2">
                 <p className="text-white/50 text-[10px] max-w-sm font-mono tracking-wide leading-relaxed">
                   By submitting you agree to our <Link href="/terms" className="text-white hover:text-[#f04e00] transition-colors">Terms of Service</Link> and <Link href="/privacy" className="text-white hover:text-[#f04e00] transition-colors">Privacy Policy</Link>
                 </p>
@@ -203,12 +225,12 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
             </div>
 
             {/* Book a Call CTA */}
-            <p className="text-white text-base md:text-lg font-medium form-element">
+            <p className="text-white text-base md:text-lg font-medium form-element opacity-0 translate-y-[30px]">
               Prefer to hop on a call? <Link href="/booking" className="text-[#f04e00] font-bold hover:opacity-80 transition-opacity">Book a call</Link> instead.
             </p>
 
             {/* Visit Details */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 w-full pt-12 border-t border-white/10 form-element">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 w-full pt-12 border-t border-white/10 form-element opacity-0 translate-y-[30px]">
               <div className="flex flex-col gap-3">
                 <span className="text-white/40 text-[10px] font-mono tracking-widest uppercase">(Address)</span>
                 <p className="text-white text-base md:text-lg font-medium leading-relaxed">
@@ -232,11 +254,11 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
           {/* FAQ Large Title */}
           <div className="flex flex-col gap-3" ref={faqMaskRef}>
             <div className="overflow-hidden pb-1">
-              <h3 className="mask-line text-[clamp(4rem,10vw,9rem)] font-black uppercase text-white leading-[0.85] tracking-tighter">
+              <h3 className="mask-line translate-y-[110%] opacity-0 text-[clamp(4rem,10vw,9rem)] font-black uppercase text-white leading-[0.85] tracking-tighter">
                 FAQ
               </h3>
             </div>
-            <p className="text-white/80 text-base md:text-lg font-medium mask-line">
+            <p className="text-white/80 text-base md:text-lg font-medium mask-line translate-y-[110%] opacity-0">
               Got specific questions? <Link href="#contact" className="text-[#f04e00] font-bold hover:opacity-80 transition-opacity">Contact Us</Link>
             </p>
           </div>
@@ -246,7 +268,7 @@ export default function ContactSection({ isStandalonePage = false }: ContactSect
             {faqs.map((faq, index) => (
               <Accordion 
                 key={index} 
-                className="faq-item"
+                className="faq-item opacity-0 translate-y-[30px]"
                 index={index}
                 title={faq.question} 
                 content={faq.answer} 

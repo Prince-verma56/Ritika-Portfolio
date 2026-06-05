@@ -1,10 +1,11 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 import SocialFooter from "@/components/SocialFooter";
+import { useLoader } from "@/context/LoaderContext";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -25,24 +26,29 @@ export interface ProjectData {
 
 export default function ProjectDetailLayout({ project }: { project: ProjectData }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const { isLoaderFinished } = useLoader();
 
   useGSAP(() => {
-    // 1. Initial Hero Mask Reveal
+    // 1. ALWAYS RUN INITIAL STATES IMMEDIATELY (UNCONDITIONAL)
     gsap.set(".mask-line", { y: "110%" });
     gsap.set(".fade-up", { opacity: 0, y: 30 });
+    gsap.set(".img-wrap", { clipPath: "inset(100% 0 0 0)" });
+    gsap.set(".scroll-text", { opacity: 0, y: 40 });
 
-    const tl = gsap.timeline();
+    // 2. Build Entrance Timeline (PAUSED)
+    const tl = gsap.timeline({ paused: true });
     tl.to(".mask-line", { y: "0%", duration: 1.2, stagger: 0.1, ease: "expo.out", delay: 0.2 })
       .to(".fade-up", { opacity: 1, y: 0, duration: 1, stagger: 0.1, ease: "power3.out" }, "-=0.8");
+    tlRef.current = tl;
 
-    // 2. Parallax Image Reveals (Applies to all images with class .img-wrap)
+    // 3. Parallax Image Reveals (Applies to all images with class .img-wrap)
     const images = gsap.utils.toArray(".img-wrap");
     images.forEach((wrap: any) => {
       const inner = wrap.querySelector(".img-inner");
       
       // The mask wipe effect
-      gsap.fromTo(wrap, 
-        { clipPath: "inset(100% 0 0 0)" },
+      gsap.to(wrap, 
         { 
           clipPath: "inset(0% 0 0 0)", 
           duration: 1.5, 
@@ -69,11 +75,10 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
       }
     });
 
-    // 3. Scroll Text Reveals for Challenge/Solution
+    // 4. Scroll Text Reveals for Challenge/Solution
     const textBlocks = gsap.utils.toArray(".scroll-text");
     textBlocks.forEach((block: any) => {
-      gsap.fromTo(block,
-        { opacity: 0, y: 40 },
+      gsap.to(block,
         {
           opacity: 1,
           y: 0,
@@ -84,7 +89,17 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
       );
     });
 
-  }, { scope: containerRef });
+  }, { scope: containerRef, dependencies: [project] });
+
+  // 5. Play timelines and refresh ScrollTriggers when loader finishes
+  useEffect(() => {
+    if (isLoaderFinished) {
+      tlRef.current?.play();
+      ScrollTrigger.refresh();
+    } else {
+      tlRef.current?.progress(0).pause();
+    }
+  }, [isLoaderFinished]);
 
   return (
     <div ref={containerRef} className="bg-[#050505] min-h-screen text-white pt-8">
@@ -95,17 +110,17 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
           {/* Title & Desc */}
           <div className="flex flex-col gap-6">
             <div className="overflow-hidden pb-4">
-              <h1 className="mask-line text-[clamp(4rem,12vw,10rem)] font-black uppercase leading-[0.8] tracking-tighter">
+              <h1 className="mask-line translate-y-[110%] text-[clamp(4rem,12vw,10rem)] font-black uppercase leading-[0.8] tracking-tighter">
                 {project.title}
               </h1>
             </div>
-            <p className="fade-up text-white/60 text-lg md:text-2xl font-medium max-w-xl leading-relaxed">
+            <p className="fade-up opacity-0 translate-y-[30px] text-white/60 text-lg md:text-2xl font-medium max-w-xl leading-relaxed">
               {project.description}
             </p>
           </div>
 
           {/* Meta Data Grid */}
-          <div className="fade-up flex flex-col gap-6 md:min-w-[300px]">
+          <div className="fade-up opacity-0 translate-y-[30px] flex flex-col gap-6 md:min-w-[300px]">
             {[
               { label: "Year", value: project.year },
               { label: "Timeline", value: project.timeline },
@@ -123,9 +138,9 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
         </div>
 
         {/* ── 2. HERO IMAGE ── */}
-        <div className="img-wrap relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-xl">
+        <div className="img-wrap relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-xl" style={{ clipPath: "inset(100% 0 0 0)" }}>
           <div className="img-inner absolute inset-0 -top-[15%] h-[130%] w-full">
-            <Image src={project.heroImage} alt={project.title} fill className="object-cover" priority />
+            <Image src={project.heroImage} alt={project.title} fill className="object-cover" priority sizes="(max-width: 1400px) 100vw, 1400px" />
           </div>
         </div>
 
@@ -133,7 +148,7 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
         <div className="flex flex-col gap-24 md:gap-32 max-w-5xl mx-auto w-full">
           
           {/* Challenge */}
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 md:gap-24 scroll-text">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 md:gap-24 scroll-text opacity-0 translate-y-[40px]">
             <h3 className="text-white/40 text-2xl md:text-3xl font-medium tracking-tight flex items-center gap-2">
               Challenges<span className="text-[#f04e00] text-3xl leading-none">.</span>
             </h3>
@@ -143,7 +158,7 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
           </div>
 
           {/* Solution */}
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 md:gap-24 scroll-text">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 md:gap-24 scroll-text opacity-0 translate-y-[40px]">
             <h3 className="text-white/40 text-2xl md:text-3xl font-medium tracking-tight flex items-center gap-2">
               Solutions<span className="text-[#f04e00] text-3xl leading-none">.</span>
             </h3>
@@ -157,9 +172,9 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
         {project.galleryImages.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
             {project.galleryImages.map((img, i) => (
-              <div key={i} className={`img-wrap relative w-full aspect-[4/3] overflow-hidden rounded-xl ${i === 2 ? 'md:col-span-2 md:aspect-[21/9]' : ''}`}>
+              <div key={i} className={`img-wrap relative w-full aspect-[4/3] overflow-hidden rounded-xl ${i === 2 ? 'md:col-span-2 md:aspect-[21/9]' : ''}`} style={{ clipPath: "inset(100% 0 0 0)" }}>
                 <div className="img-inner absolute inset-0 -top-[15%] h-[130%] w-full">
-                  <Image src={img} alt={`Gallery ${i}`} fill className="object-cover" />
+                  <Image src={img} alt={`Gallery ${i}`} fill className="object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1400px) 50vw, 700px" />
                 </div>
               </div>
             ))}
@@ -167,7 +182,7 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
         )}
 
         {/* ── 5. RESULTS DATA ── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 max-w-5xl mx-auto w-full py-16 scroll-text border-y border-white/10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 max-w-5xl mx-auto w-full py-16 scroll-text opacity-0 translate-y-[40px] border-y border-white/10">
           {project.results.map((res, i) => (
             <div key={i} className="flex flex-col gap-2">
               <span className="text-[3rem] md:text-[5rem] font-black leading-none tracking-tighter">{res.value}</span>

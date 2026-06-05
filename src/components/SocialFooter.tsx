@@ -44,6 +44,7 @@ export default function SocialFooter() {
           alt="Footer Background"
           fill
           className="object-cover opacity-50" // Adjust opacity (0-100) to make the image brighter or darker
+          sizes="100vw"
         />
         {/* Dark gradient overlay to blend the image into the black background and keep text readable */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-[#050505]/30" />

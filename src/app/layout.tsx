@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Geist } from "next/font/google";
 import "./globals.css";
 import ClientSmoothScroller from "@/components/ClientSmoothScroller";
+import Navbar from "@/components/Navbar";
+import Preloader from "@/components/Preloader";
+import { LoaderProvider } from "@/context/LoaderContext";
 import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
@@ -25,7 +28,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         style={{ fontFamily: "var(--font-space), sans-serif" }}
         suppressHydrationWarning
       >
-        <ClientSmoothScroller>{children}</ClientSmoothScroller>
+        <LoaderProvider>
+          <Preloader />
+          <Navbar />
+          <ClientSmoothScroller>{children}</ClientSmoothScroller>
+        </LoaderProvider>
       </body>
     </html>
   );

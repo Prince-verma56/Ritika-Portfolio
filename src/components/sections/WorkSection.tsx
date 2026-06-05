@@ -1,11 +1,12 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 import Link from "next/link"; // Imported Next.js Link
-import { FollowerPointerCard } from "../FollowerPointerCard"; // Adjust path as needed
+import { FollowerPointerCard } from "../FollowerPointerCard";
+import { useLoader } from "@/context/LoaderContext"; // Adjust path as needed
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -48,9 +49,24 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const titleTlRef = useRef<gsap.core.Timeline | null>(null);
+  const firstProjectTlRef = useRef<gsap.core.Timeline | null>(null);
+  const { isLoaderFinished } = useLoader();
 
   useGSAP(() => {
-    // 1. Section Clip-Path (Slant -> Flat) - Only on scroll page
+    // 1. ALWAYS RUN INITIAL STATES IMMEDIATELY (UNCONDITIONAL)
+    gsap.set(".mask-title", { y: "110%", opacity: 0 });
+    itemRefs.current.forEach((item) => {
+      if (!item) return;
+      const maskedTexts = item.querySelectorAll(".mask-text");
+      const menuItems = item.querySelectorAll(".menu-item");
+      const imgWrap = item.querySelector(".img-wrap");
+      gsap.set(imgWrap, { clipPath: "inset(100% 0 0 0)" });
+      gsap.set(maskedTexts, { y: "110%", opacity: 0 });
+      gsap.set(menuItems, { opacity: 0, x: -20 });
+    });
+
+    // 2. Section Clip-Path (Slant -> Flat) - Only on scroll page
     if (!isStandalonePage) {
       gsap.fromTo(
         sectionRef.current,
@@ -67,7 +83,7 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
         }
       );
 
-      // 2. Parallax: Content sliding up smoothly
+      // Parallax: Content sliding up smoothly
       gsap.fromTo(
         contentRef.current,
         { y: 150 },
@@ -85,23 +101,25 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
     }
 
     // 3. Main Title Mask Reveal
-    gsap.fromTo(
-      ".mask-title",
-      { y: "110%", opacity: 0 },
-      {
-        y: "0%",
-        opacity: 1,
-        duration: 1.5,
-        ease: "power4.out",
-        scrollTrigger: {
-          trigger: ".mask-title-wrapper",
-          start: "top 85%",
-        },
-      }
-    );
+    const titleTl = gsap.timeline({ paused: true });
+    titleTl.to(".mask-title", {
+      y: "0%",
+      opacity: 1,
+      duration: 1.5,
+      ease: "power4.out",
+    });
+    titleTlRef.current = titleTl;
+
+    if (!isStandalonePage) {
+      ScrollTrigger.create({
+        trigger: ".mask-title-wrapper",
+        start: "top 85%",
+        onEnter: () => titleTl.play()
+      });
+    }
 
     // 4. Per-Project Timeline Animations
-    itemRefs.current.forEach((item) => {
+    itemRefs.current.forEach((item, index) => {
       if (!item) return;
 
       const maskedTexts = item.querySelectorAll(".mask-text");
@@ -109,20 +127,20 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
       const imgWrap = item.querySelector(".img-wrap");
       const imgInner = item.querySelector(".img-inner");
 
-      gsap.set(imgWrap, { clipPath: "inset(100% 0 0 0)" });
-      gsap.set(maskedTexts, { y: "110%", opacity: 0 });
-      gsap.set(menuItems, { opacity: 0, x: -20 });
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: item,
-          start: "top 75%",
-        },
-      });
-
+      const tl = gsap.timeline({ paused: true });
       tl.to(imgWrap, { clipPath: "inset(0% 0 0 0)", duration: 1.5, ease: "power3.inOut" })
         .to(maskedTexts, { y: "0%", opacity: 1, duration: 1.2, stagger: 0.1, ease: "power4.out" }, "-=1")
         .to(menuItems, { opacity: 1, x: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" }, "-=0.8");
+
+      if (isStandalonePage && index === 0) {
+        firstProjectTlRef.current = tl;
+      } else {
+        ScrollTrigger.create({
+          trigger: item,
+          start: "top 75%",
+          onEnter: () => tl.play()
+        });
+      }
 
       if (imgInner) {
         gsap.fromTo(
@@ -144,6 +162,22 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
 
   }, { scope: sectionRef, dependencies: [isStandalonePage] });
 
+  // 5. Play timelines and refresh ScrollTriggers when loader finishes
+  useEffect(() => {
+    if (isLoaderFinished) {
+      if (isStandalonePage) {
+        titleTlRef.current?.play();
+        firstProjectTlRef.current?.play();
+      }
+      ScrollTrigger.refresh();
+    } else {
+      if (isStandalonePage) {
+        titleTlRef.current?.progress(0).pause();
+        firstProjectTlRef.current?.progress(0).pause();
+      }
+    }
+  }, [isLoaderFinished, isStandalonePage]);
+
   return (
     <section
       ref={sectionRef}
@@ -158,7 +192,7 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
       <div ref={contentRef} className="max-w-[1400px] mx-auto flex flex-col will-change-transform">
 
         <div className="mask-title-wrapper overflow-hidden pb-4 mb-24 md:mb-40">
-          <h2 className="mask-title text-[clamp(4rem,12vw,9rem)] font-black uppercase text-[#f04e00] leading-[0.85] tracking-tighter">
+          <h2 className="mask-title translate-y-[110%] opacity-0 text-[clamp(4rem,12vw,9rem)] font-black uppercase text-[#f04e00] leading-[0.85] tracking-tighter">
             LATEST WORK.
           </h2>
         </div>
@@ -174,7 +208,7 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
               {/* Left Side: Sticky Navigation Index */}
               <div className="flex flex-col gap-10 lg:sticky lg:top-40 pt-4">
                 <div className="overflow-hidden pb-2">
-                  <span className="mask-text block text-[clamp(5rem,8vw,7rem)] font-black text-white leading-none tracking-tighter">
+                  <span className="mask-text block translate-y-[110%] opacity-0 text-[clamp(5rem,8vw,7rem)] font-black text-white leading-none tracking-tighter">
                     {project.id}.
                   </span>
                 </div>
@@ -183,7 +217,7 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
                   {projects.map((p) => {
                     const isActive = p.id === project.id;
                     return (
-                      <div key={p.id} className="menu-item flex items-center gap-6 group cursor-default">
+                      <div key={p.id} className="menu-item opacity-0 -translate-x-[20px] flex items-center gap-6 group cursor-default">
                         <div
                           className={`h-[2px] transition-all duration-500 ease-out ${
                             isActive ? "w-16 bg-white" : "w-8 bg-neutral-800"
@@ -209,10 +243,10 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
 
                 <div className="overflow-hidden mb-6 flex justify-between items-end">
                   <div className="flex flex-col gap-1">
-                    <span className="mask-text text-neutral-500 font-mono text-xs uppercase tracking-widest">
+                    <span className="mask-text translate-y-[110%] opacity-0 text-neutral-500 font-mono text-xs uppercase tracking-widest">
                       Year — {project.year}
                     </span>
-                    <span className="mask-text text-white/80 text-sm md:text-base font-light tracking-wide">
+                    <span className="mask-text translate-y-[110%] opacity-0 text-white/80 text-sm md:text-base font-light tracking-wide">
                       {project.subtitle}
                     </span>
                   </div>
@@ -221,7 +255,7 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
                 {/* ── UPDATED: Wrapped with Next.js <Link> & Custom Follower ── */}
                 <Link href={project.link} className="block w-full">
                   <FollowerPointerCard title="View Project" className="w-full">
-                    <div className="img-wrap relative w-full aspect-[4/3] md:aspect-[16/10] overflow-hidden rounded-md group bg-neutral-900">
+                    <div className="img-wrap relative w-full aspect-[4/3] md:aspect-[16/10] overflow-hidden rounded-md group bg-neutral-900" style={{ clipPath: "inset(100% 0 0 0)" }}>
                       <div className="img-inner absolute inset-0 -top-[15%] h-[130%] w-full">
                         <Image
                           src={project.image}
@@ -240,7 +274,7 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
                 <div className="mt-6 flex flex-wrap gap-2">
                   {project.tags.map((tag) => (
                     <div key={tag} className="overflow-hidden">
-                      <span className="mask-text block text-[10px] text-neutral-500 border border-neutral-800 px-3 py-1.5 uppercase tracking-widest font-mono rounded-sm">
+                      <span className="mask-text block translate-y-[110%] opacity-0 text-[10px] text-neutral-500 border border-neutral-800 px-3 py-1.5 uppercase tracking-widest font-mono rounded-sm">
                         {tag}
                       </span>
                     </div>

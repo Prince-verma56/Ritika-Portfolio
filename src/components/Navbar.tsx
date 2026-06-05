@@ -34,18 +34,28 @@ export default function Navbar() {
   }, []);
 
   useGSAP(() => {
+    // Unconditionally kill the old scroll trigger if it exists to prevent it from persisting on route change
+    const oldTrigger = ScrollTrigger.getById("logo-shrink");
+    if (oldTrigger) {
+      oldTrigger.kill();
+    }
+
     // ── 1. The Shrinking Logo Effect ──
     if (isHome) {
       gsap.to(".nav-logo-text", {
         fontSize: "24px", // Shrinks to normal logo size on scroll
         ease: "power2.inOut",
         scrollTrigger: {
+          id: "logo-shrink",
           trigger: document.body,
           start: "top top",
           end: "300px top",
           scrub: 1,
         },
       });
+    } else {
+      // Clear inline style so Tailwind class controls the font size
+      gsap.set(".nav-logo-text", { clearProps: "all" });
     }
 
     // ── 2. Top Right Entrance Animations ──
@@ -81,7 +91,7 @@ export default function Navbar() {
         { opacity: 1, y: 0, stagger: 0.1, duration: 0.6, ease: "power3.out" },
         "-=0.5"
       );
-  }, { dependencies: [isHome] });
+  }, { dependencies: [pathname, isHome] });
 
   // Play/Reverse menu and lock scrolling
   useEffect(() => {
@@ -104,11 +114,7 @@ export default function Navbar() {
         <div className="pointer-events-auto min-w-0 max-w-[80vw] md:max-w-none shrink">
           <Link 
             href="/" 
-            className={`nav-logo-text font-black uppercase text-white leading-[0.8] tracking-tighter origin-top-left transition-colors hover:text-white/80 whitespace-nowrap block will-change-auto ${
-              isHome 
-                ? "text-[20vw] sm:text-[14vw] md:text-[11vw]" 
-                : "text-2xl md:text-3xl"
-            }`}
+            className={"nav-logo-text font-black uppercase text-white whitespace-nowrap block " + (isHome ? "text-[20vw] sm:text-[14vw] md:text-[11vw] origin-top-left will-change-auto leading-[0.8] tracking-tighter transition-colors hover:text-white/80" : "text-2xl md:text-3xl tracking-tighter hover:text-white/80 transition-colors")}
           >
             RITIKA<sup className="text-[clamp(10px,2vw,1.5rem)] font-bold align-super ml-1 md:ml-2">®</sup>
           </Link>
