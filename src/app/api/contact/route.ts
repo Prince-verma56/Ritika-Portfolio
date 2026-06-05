@@ -123,6 +123,9 @@ export async function POST(request: Request) {
       to: emailUser, // Deliver to my inbox
       replyTo: sanitizedEmail, // Clicking reply goes to visitor
       subject: "New Portfolio Contact Request",
+      headers: {
+        "X-Entity-Ref-ID": Date.now().toString(),
+      },
       html: `
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml">
@@ -171,6 +174,9 @@ export async function POST(request: Request) {
           </style>
         </head>
         <body style="background-color: #050505; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+          <span style="display:none;visibility:hidden;mso-hide:all;font-size:1px;color:#050505;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+            Message ID: ${Date.now()}
+          </span>
           <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #050505; width: 100%;">
             <tr>
               <td align="center" style="padding: 40px 16px;" class="body-padding">
@@ -275,7 +281,7 @@ export async function POST(request: Request) {
                       <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                           <td align="center" style="font-size: 11px; font-weight: 700; color: #52525b; text-transform: uppercase; letter-spacing: 0.2em; font-family: monospace;">
-                            Sent via Ritika Portfolio
+                            Sent via Ritika Portfolio &bull; ${timestamp}
                           </td>
                         </tr>
                       </table>
@@ -297,6 +303,9 @@ export async function POST(request: Request) {
       from: `"Ritika Rawat" <${emailUser}>`,
       to: sanitizedEmail,
       subject: "Thank You For Reaching Out",
+      headers: {
+        "X-Entity-Ref-ID": Date.now().toString(),
+      },
       html: `
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml">
@@ -333,6 +342,9 @@ export async function POST(request: Request) {
           </style>
         </head>
         <body style="background-color: #050505; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+          <span style="display:none;visibility:hidden;mso-hide:all;font-size:1px;color:#050505;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+            Message ID: ${Date.now()}
+          </span>
           <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #050505; width: 100%;">
             <tr>
               <td align="center" style="padding: 40px 16px;" class="body-padding">
@@ -422,7 +434,7 @@ export async function POST(request: Request) {
                       <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                           <td align="center" style="font-size: 11px; font-weight: 700; color: #52525b; text-transform: uppercase; letter-spacing: 0.2em; font-family: monospace;">
-                            Sent via Ritika Portfolio
+                            Sent via Ritika Portfolio &bull; ${timestamp}
                           </td>
                         </tr>
                       </table>

@@ -4,6 +4,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { useLoader } from "@/context/LoaderContext";
+import Text3DFlip from "@/components/ui/text-3d-flip";
+import ShimmerText from "@/components/kokonutui/shimmer-text";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -184,29 +186,45 @@ export default function AboutSection({ isStandalonePage = false }: AboutSectionP
         {/* ── Intro Typography ── */}
         <div className="w-full flex flex-col gap-2 md:gap-4 px-6 md:px-12 lg:pl-[10%]">
           <div className="overflow-hidden pb-2">
-            <h2 className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight text-white">
-              Hi, I'm <span className="text-[#f04e00] font-black">Ritika</span> – a B.Tech AI & Data
+            <h2 className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight flex flex-wrap items-baseline">
+              <ShimmerText as="span" hoverOnly={true} text="Hi, I'm" className="inline-flex font-medium bg-gradient-to-r from-white via-neutral-400 to-white" />
+              <span className="whitespace-pre"> </span>
+              <ShimmerText as="span" hoverOnly={true} text="Ritika" className="inline-flex font-black text-[#f04e00]" />
+              <span className="whitespace-pre"> </span>
+              <ShimmerText as="span" hoverOnly={true} text="– a B.Tech AI & Data" className="inline-flex font-medium bg-gradient-to-r from-white via-neutral-400 to-white" />
             </h2>
           </div>
           <div className="overflow-hidden pb-2">
-            <h2 className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight text-white">
-              Analytics student who ships real things.
-            </h2>
+            <ShimmerText
+              as="h2"
+              text="Analytics student who ships real things."
+              hoverOnly={true}
+              className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(2rem,5vw,5.5rem)] font-medium leading-[1.05] tracking-tight inline-flex bg-gradient-to-r from-white via-neutral-400 to-white"
+            />
           </div>
           <div className="overflow-hidden pb-2 mt-4 md:mt-8">
-            <h2 className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-400">
-              I build across the stack: ML pipelines, 
-            </h2>
+            <ShimmerText
+              as="h2"
+              text="I build across the stack: ML pipelines,"
+              hoverOnly={true}
+              className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight bg-gradient-to-r from-neutral-400 via-white to-neutral-400 inline-flex"
+            />
           </div>
           <div className="overflow-hidden pb-2">
-            <h2 className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-400">
-              mobile apps, IoT dashboards, and
-            </h2>
+            <ShimmerText
+              as="h2"
+              text="mobile apps, IoT dashboards, and"
+              hoverOnly={true}
+              className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight bg-gradient-to-r from-neutral-400 via-white to-neutral-400 inline-flex"
+            />
           </div>
           <div className="overflow-hidden pb-2">
-            <h2 className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight text-neutral-400">
-              interfaces people actually want to use.
-            </h2>
+            <ShimmerText
+              as="h2"
+              text="interfaces people actually want to use."
+              hoverOnly={true}
+              className="mask-reveal-inner opacity-0 translate-y-[120%] rotate-2 text-[clamp(1.5rem,4vw,4.5rem)] font-light leading-[1.1] tracking-tight bg-gradient-to-r from-neutral-400 via-white to-neutral-400 inline-flex"
+            />
           </div>
         </div>
 
