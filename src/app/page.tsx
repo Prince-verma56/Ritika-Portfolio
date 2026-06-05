@@ -29,7 +29,7 @@ export default function Home() {
         <ServicesSection />
         <WorkSection />
         <AchievementsSection />
-         <SocialFooter />
+        <SocialFooter />
         <FooterSection />
 
       </main>

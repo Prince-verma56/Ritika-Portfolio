@@ -4,7 +4,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
-import SocialFooter from "@/components/SocialFooter";
 import { useLoader } from "@/context/LoaderContext";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -192,9 +191,6 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
         </div>
 
       </div>
-
-      {/* ── 6. COMMON FOOTER ── */}
-      <SocialFooter />
     </div>
   );
 }

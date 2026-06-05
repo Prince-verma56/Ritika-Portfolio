@@ -21,6 +21,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [time, setTime] = useState("");
   const menuTl = useRef<gsap.core.Timeline | null>(null);
+  const containerRef = useRef<HTMLElement>(null);
 
   // Simple clock for the top right
   useEffect(() => {
@@ -91,7 +92,7 @@ export default function Navbar() {
         { opacity: 1, y: 0, stagger: 0.1, duration: 0.6, ease: "power3.out" },
         "-=0.5"
       );
-  }, { dependencies: [pathname, isHome] });
+  }, { scope: containerRef, dependencies: [pathname] });
 
   // Play/Reverse menu and lock scrolling
   useEffect(() => {
@@ -105,7 +106,7 @@ export default function Navbar() {
   }, [isMenuOpen]);
 
   return (
-    <>
+    <nav ref={containerRef}>
       {/* ── Main Top Bar (Fixed Header) ── */}
       <header className="fixed top-0 left-0 w-full z-[9000] pointer-events-none px-6 md:px-10 pt-8 md:pt-10 flex justify-between items-start">
 
@@ -234,6 +235,6 @@ export default function Navbar() {
 
         </div>
       </div>
-    </>
+    </nav>
   );
 }
