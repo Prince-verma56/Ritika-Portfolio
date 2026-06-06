@@ -40,19 +40,19 @@ export const projectsData: ProjectData[] = [
   {
     id: "dhritam",
     title: "Dhritam",
-    description: "An AI-powered real-time health monitoring and prediction platform combining IoT wearable streams with complex event processing engines to alert medical professionals.",
-    year: "2024",
+    description: "Dhritam is a BCI-based neuro-cardiac rehabilitation platform that enables continuous remote monitoring of cardiac patients through real-time EEG and ECG signal analysis. Built as a cross-platform Flutter mobile application with Firebase backend, it serves two users simultaneously — patients engaging through gamified recovery modules and clinicians monitoring live signal dashboards. The ML pipeline at its core applies bandpass filtering for noise removal, FFT for frequency-domain feature extraction, SVM for real-time cardiac anomaly classification, and LSTM for tracking neurological recovery trajectories over time. Dhritam won First Place at the Global AI Summit 2026, competing against teams from across the country.",
+    year: "2026",
     timeline: "4 Months",
-    services: "Python / TensorFlow / IoT Dashboard",
+    services: "Flutter / Firebase / Machine Learning",
     liveLink: "https://dhritam.health",
-    heroImage: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1800&q=90",
+    heroImage: "https://res.cloudinary.com/dtslaveid/image/upload/v1780759046/four_d9ouzk.jpg",
     galleryImages: [
-      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&q=80",
-      "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=1200&q=80",
-      "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?w=1800&q=90"
+      "https://res.cloudinary.com/dtslaveid/image/upload/v1780759046/three_uf1btr.jpg",
+      "https://res.cloudinary.com/dtslaveid/image/upload/v1780759045/one_ijgxgs.jpg",
+      "https://res.cloudinary.com/dtslaveid/image/upload/v1780759046/two_z4qvac.jpg"
     ],
-    challenge: "Medical alert devices are often prone to high false-alarm rates, causing alarm fatigue among hospital staff. We needed to develop a system that could aggregate noisy multi-parameter sensor streams (heart rate, blood oxygen, posture) and accurately flag anomalies in under 200 milliseconds.",
-    solution: "We trained lightweight 1D convolutional neural networks (1D-CNN) that run locally on Edge gateways and sync with a central cloud system. The dashboard uses highly optimized custom canvas graphing to render thousands of data streams dynamically at 60fps without choking browser processes.",
+    challenge: "Cardiac rehabilitation requires consistent, supervised monitoring — but for most patients in India, that means frequent hospital visits that are expensive, time-consuming, and often impossible. Over 70% of cardiac patients live in Tier 2 and Tier 3 cities where rehabilitation infrastructure simply does not exist. Patients drop out of recovery programs, and dropout directly increases mortality risk. Between hospital visits, there is zero monitoring — if a cardiac anomaly occurs at midnight on a Tuesday, nobody knows until the next scheduled appointment. The system is episodic when it needs to be continuous.",
+    solution: "Dhritam brings the monitoring to the patient instead of bringing the patient to the hospital. Wearable EEG and ECG sensors stream biological signals continuously into the mobile app, where the ML pipeline cleans, analyses, and classifies them in real time — detecting cardiac anomalies the moment they appear and tracking neurological recovery across every session. Clinicians receive instant alerts and access live dashboards showing each patient's brain and heart activity simultaneously. Patients stay engaged through gamified modules whose difficulty responds to their actual LSTM-detected recovery progress. Rehabilitation becomes continuous, intelligent, and accessible — regardless of where the patient lives.",
     results: [
       { value: "98.7%", label: "Anomaly Prediction Accuracy" },
       { value: "92%", label: "Reduction in Alarm Fatigue" },
@@ -63,19 +63,19 @@ export const projectsData: ProjectData[] = [
   {
     id: "hazu",
     title: "Hazu",
-    description: "A business predictive analytics intelligence dashboard designed to streamline internal logistics pipelines, supply chain predictions, and global cargo tracking.",
+    description: "HAZU is an AI-powered smart industrial safety and monitoring system that continuously watches over dangerous industrial environments using IoT sensors and detects hazards before they escalate. It acts as a digital safety officer — one that never sleeps and monitors an entire facility simultaneously. Built using React.js, Node.js, Arduino IDE, MQTT, and WebSockets, HAZU unifies fragmented safety infrastructure into a single intelligent platform targeting three critical hazards — gas leaks, equipment overheating, and excessive noise exposure.",
     year: "2023",
     timeline: "6 Months",
-    services: "React / D3.js / Machine Learning",
+    services: "React.js / Node.js / IoT / ML",
     liveLink: "https://hazu.io",
-    heroImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1800&q=90",
+    heroImage: "https://res.cloudinary.com/dcdssvhkm/image/upload/v1780684540/WhatsApp_Image_2026-06-05_at_11.58.21_PM_mfbmd2.jpg",
     galleryImages: [
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80",
-      "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=1200&q=80",
-      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1800&q=90"
+      "https://res.cloudinary.com/dcdssvhkm/image/upload/v1780684540/WhatsApp_Image_2026-06-05_at_11.58.20_PM_zed1fj.jpg",
+      "https://res.cloudinary.com/dcdssvhkm/image/upload/v1780684540/WhatsApp_Image_2026-06-05_at_11.58.21_PM_mfbmd2.jpg",
+      "https://res.cloudinary.com/dcdssvhkm/image/upload/v1780684540/WhatsApp_Image_2026-06-05_at_11.49.17_PM_wlqbmz.jpg"
     ],
-    challenge: "Enterprise managers are frequently overwhelmed by complex spreadsheets, making it difficult to detect supply chain blockages before they occur. The goal was to build a dashboard that transforms million-row datasets into clear, actionable predictive flows.",
-    solution: "Using advanced D3.js layout algorithms and Web Workers, we built custom interactive Sankey and network graphs that update in real-time. A background machine learning service continuously processes inventory reports, highlighting potential bottlenecks up to 72 hours in advance.",
+    challenge: "Industrial workplaces remain dangerously under-monitored despite available technology. Traditional safety systems are purely threshold-based — alarms trigger only after dangerous levels are already crossed, meaning workers are exposed before any response begins. Monitoring is fragmented across disconnected devices, inspections happen manually every few hours, and no existing system can recognise warning patterns before a threshold is hit. The infrastructure is reactive, fragmented, and fundamentally too slow.",
+    solution: "HAZU replaces reactive monitoring with proactive AI-driven intelligence. Sensors feed continuous readings via MQTT into a Node.js backend, which streams live data through WebSockets to a React.js dashboard — updating in real time as safety officers watch. The ML layer goes beyond threshold detection by analysing sensor patterns and flagging anomalies before danger levels are reached — identifying a slow gas leak or abnormal temperature rise long before a traditional alarm would trigger. Disasters are prevented, not just reported.",
     results: [
       { value: "3.2x", label: "Speedup in Management Audits" },
       { value: "22%", label: "Decrease in Inventory Costs" },

@@ -245,14 +245,17 @@ export default function Navbar() {
           <div className="menu-meta flex flex-col gap-4 items-end text-right">
             <span className="text-white/40 text-[10px] font-mono tracking-widest uppercase">(Connect)</span>
             <div className="flex flex-col gap-3 items-end">
-              <a href="mailto:hello@ritika.com" className="text-[#f04e00] text-sm md:text-base font-bold hover:opacity-80 transition-opacity cursor-pointer">
-                hello@ritika.com
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ritikarawat3225@gmail.com" target="_blank" rel="noopener noreferrer" className="text-[#f04e00] text-sm md:text-base font-bold hover:text-white transition-colors cursor-pointer">
+                ritikarawat3225@gmail.com
               </a>
               <div className="flex flex-col gap-1.5 items-end">
-                {["X/Twitter", "LinkedIn", "GitHub"].map((social) => (
-                  <Link key={social} href="/contact" className="text-white/70 text-xs md:text-sm hover:text-white transition-colors flex items-center gap-1 group cursor-pointer">
-                    <span className="opacity-0 group-hover:opacity-100 group-hover:-translate-x-1 transition-all text-[10px]">↗</span> {social}
-                  </Link>
+                {[
+                  { name: "LinkedIn", url: "https://www.linkedin.com/in/ritikarawat01?utm_source=share_via&utm_content=profile&utm_medium=member_android" },
+                  { name: "Instagram", url: "https://www.instagram.com/ritika_.rawat._?igsh=NGJ3bGNxdThxZHlw" }
+                ].map((social) => (
+                  <a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" className="text-white/70 text-xs md:text-sm hover:text-[#f04e00] transition-colors flex items-center gap-1 group cursor-pointer">
+                    <span className="opacity-0 group-hover:opacity-100 group-hover:-translate-x-1 transition-all text-[10px]">↗</span> {social.name}
+                  </a>
                 ))}
               </div>
             </div>

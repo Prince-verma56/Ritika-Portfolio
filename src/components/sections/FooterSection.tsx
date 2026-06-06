@@ -8,7 +8,7 @@ export default function FooterSection() {
       </h2>
       <a
         href="mailto:hello@yourportfolio.dev"
-        className="text-lg md:text-2xl font-medium text-white border-b border-white/20 pb-2 hover:text-[#f04e00] hover:border-[#f04e00] transition-colors duration-300"
+        className="text-lg md:text-2xl font-medium text-white border-b border-white/20 pb-2 hover:text-[#2b2b2b] hover:border-[#1d1d1d] transition-colors duration-300"
       >
         hello@yourportfolio.dev
       </a>

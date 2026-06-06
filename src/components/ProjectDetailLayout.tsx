@@ -113,7 +113,7 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
                 {project.title}
               </h1>
             </div>
-            <p className="fade-up opacity-0 translate-y-[30px] text-white/60 text-lg md:text-2xl font-medium max-w-xl leading-relaxed">
+            <p className="fade-up opacity-0 translate-y-[30px] text-white/70 text-base md:text-lg font-normal max-w-2xl leading-[1.8]">
               {project.description}
             </p>
           </div>
@@ -151,7 +151,7 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
             <h3 className="text-white/40 text-2xl md:text-3xl font-medium tracking-tight flex items-center gap-2">
               Challenges<span className="text-[#f04e00] text-3xl leading-none">.</span>
             </h3>
-            <p className="text-white/90 text-xl md:text-3xl font-medium leading-[1.4] tracking-tight">
+            <p className="text-white/80 text-lg md:text-xl font-normal leading-[1.8]">
               {project.challenge}
             </p>
           </div>
@@ -161,7 +161,7 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
             <h3 className="text-white/40 text-2xl md:text-3xl font-medium tracking-tight flex items-center gap-2">
               Solutions<span className="text-[#f04e00] text-3xl leading-none">.</span>
             </h3>
-            <p className="text-white/90 text-xl md:text-3xl font-medium leading-[1.4] tracking-tight">
+            <p className="text-white/80 text-lg md:text-xl font-normal leading-[1.8]">
               {project.solution}
             </p>
           </div>

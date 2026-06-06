@@ -18,7 +18,7 @@ const projects = [
     subtitle: "Indian Heritage & Travel Platform",
     tags: ["Next.js", "WebGL", "Travel"],
     image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1800&q=90",
-    link: "/works/adhayaya", 
+    link: "/works/adhayaya",
     year: "2024",
   },
   {
@@ -35,7 +35,7 @@ const projects = [
     title: "Hazu",
     subtitle: "Predictive Analytics Dashboard",
     tags: ["React", "D3.js", "ML"],
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1800&q=90",
+    image: "https://res.cloudinary.com/dcdssvhkm/image/upload/v1780684540/WhatsApp_Image_2026-06-05_at_11.58.21_PM_mfbmd2.jpg",
     link: "/works/hazu",
     year: "2023",
   },
@@ -182,9 +182,8 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
     <section
       ref={sectionRef}
       id="work"
-      className={`relative z-30 bg-[#050505] px-6 md:px-16 overflow-hidden w-full will-change-transform ${
-        isStandalonePage ? "pt-8 pb-32" : "py-32"
-      }`}
+      className={`relative z-30 bg-[#050505] px-6 md:px-16 overflow-hidden w-full will-change-transform ${isStandalonePage ? "pt-8 pb-32" : "py-32"
+        }`}
       style={isStandalonePage ? {} : {
         clipPath: "polygon(0% 12%, 100% 0%, 100% 100%, 0% 100%)",
       }}
@@ -219,16 +218,14 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
                     return (
                       <div key={p.id} className="menu-item opacity-0 -translate-x-[20px] flex items-center gap-6 group cursor-default">
                         <div
-                          className={`h-[2px] transition-all duration-500 ease-out ${
-                            isActive ? "w-16 bg-white" : "w-8 bg-neutral-800"
-                          }`}
+                          className={`h-[2px] transition-all duration-500 ease-out ${isActive ? "w-16 bg-white" : "w-8 bg-neutral-800"
+                            }`}
                         />
                         <span
-                          className={`text-lg md:text-xl transition-all duration-500 tracking-wide ${
-                            isActive 
-                              ? "text-white font-bold underline decoration-2 underline-offset-[6px] decoration-white/30" 
+                          className={`text-lg md:text-xl transition-all duration-500 tracking-wide ${isActive
+                              ? "text-white font-bold underline decoration-2 underline-offset-[6px] decoration-white/30"
                               : "text-neutral-500 font-medium"
-                          }`}
+                            }`}
                         >
                           {p.title}
                         </span>

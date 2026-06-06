@@ -8,6 +8,7 @@ import { LoaderProvider } from "@/context/LoaderContext";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
 import "sonner/dist/styles.css";
+import { SmoothCursor } from "@/components/ui/smooth-cursor";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -26,10 +27,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={cn("font-sans", geist.variable)} suppressHydrationWarning>
       <body
-        className="bg-black text-white antialiased"
+        className="bg-black text-white antialiased cursor-none"
         style={{ fontFamily: "var(--font-space), sans-serif" }}
         suppressHydrationWarning
       >
+        <SmoothCursor />
         <LoaderProvider>
           <Preloader />
           <Navbar />
