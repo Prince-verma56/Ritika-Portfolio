@@ -8,6 +8,12 @@ interface PageProps {
   }>;
 }
 
+export async function generateStaticParams() {
+  return projectsData.map((project) => ({
+    projectId: project.id,
+  }));
+}
+
 export default async function ProjectPage({ params }: PageProps) {
   const { projectId } = await params;
   const project = projectsData.find((p) => p.id === projectId);
