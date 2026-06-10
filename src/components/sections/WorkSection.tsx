@@ -17,7 +17,7 @@ const projects = [
     title: "Adhayaya",
     subtitle: "Indian Heritage & Travel Platform",
     tags: ["Next.js", "WebGL", "Travel"],
-    image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1800&q=90",
+    image: "https://res.cloudinary.com/dtslaveid/image/upload/v1781108027/Screenshot_2026-06-09_202735_ixq9ul.png",
     link: "/works/adhayaya",
     year: "2024",
   },
@@ -26,7 +26,7 @@ const projects = [
     title: "Dhritam",
     subtitle: "AI-Powered Health Monitoring",
     tags: ["Python", "TensorFlow", "IoT"],
-    image: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1800&q=90",
+    image: "https://res.cloudinary.com/dtslaveid/image/upload/v1780759046/four_d9ouzk.jpg",
     link: "/works/dhritam",
     year: "2024",
   },
@@ -223,8 +223,8 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
                         />
                         <span
                           className={`text-lg md:text-xl transition-all duration-500 tracking-wide ${isActive
-                              ? "text-white font-bold underline decoration-2 underline-offset-[6px] decoration-white/30"
-                              : "text-neutral-500 font-medium"
+                            ? "text-white font-bold underline decoration-2 underline-offset-[6px] decoration-white/30"
+                            : "text-neutral-500 font-medium"
                             }`}
                         >
                           {p.title}
@@ -258,7 +258,7 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
                           src={project.image}
                           alt={project.title}
                           fill
-                          className="object-cover opacity-90 transition-transform duration-700 group-hover:scale-105"
+                          className="object-cover object-center opacity-90 transition-transform duration-700 group-hover:scale-105"
                           sizes="(max-width: 1024px) 100vw, 70vw"
                           priority={index === 0}
                         />

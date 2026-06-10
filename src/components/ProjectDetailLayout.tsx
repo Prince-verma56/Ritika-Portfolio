@@ -45,12 +45,12 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
     const images = gsap.utils.toArray(".img-wrap");
     images.forEach((wrap: any) => {
       const inner = wrap.querySelector(".img-inner");
-      
+
       // The mask wipe effect
-      gsap.to(wrap, 
-        { 
-          clipPath: "inset(0% 0 0 0)", 
-          duration: 1.5, 
+      gsap.to(wrap,
+        {
+          clipPath: "inset(0% 0 0 0)",
+          duration: 1.5,
           ease: "power4.inOut",
           scrollTrigger: { trigger: wrap, start: "top 80%" }
         }
@@ -101,9 +101,9 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
   }, [isLoaderFinished]);
 
   return (
-    <div ref={containerRef} className="bg-[#050505] min-h-screen text-white pt-8">
+    <div ref={containerRef} className="bg-[#050505] min-h-screen text-white pt-28 md:pt-36 lg:pt-44">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20 flex flex-col gap-32 pb-32">
-        
+
         {/* ── 1. HERO SECTION (Title & Meta) ── */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-12 lg:gap-32 items-start">
           {/* Title & Desc */}
@@ -113,7 +113,7 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
                 {project.title}
               </h1>
             </div>
-            <p className="fade-up opacity-0 translate-y-[30px] text-white/70 text-base md:text-lg font-normal max-w-2xl leading-[1.8]">
+            <p className="fade-up opacity-0 translate-y-[30px] text-white/60 text-lg md:text-2xl font-medium max-w-xl leading-relaxed">
               {project.description}
             </p>
           </div>
@@ -137,21 +137,21 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
         </div>
 
         {/* ── 2. HERO IMAGE ── */}
-        <div className="img-wrap relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-xl" style={{ clipPath: "inset(100% 0 0 0)" }}>
+        <div className="img-wrap relative w-full aspect-[16/12] md:aspect-[28/9] overflow-hidden rounded-xl" style={{ clipPath: "inset(100% 0 0 0)" }}>
           <div className="img-inner absolute inset-0 -top-[15%] h-[130%] w-full">
-            <Image src={project.heroImage} alt={project.title} fill className="object-cover" priority sizes="(max-width: 1400px) 100vw, 1400px" />
+            <Image src={project.heroImage} alt={project.title} fill className="object-cover object-center " priority sizes="(max-width: 1400px) 100vw, 1400px" />
           </div>
         </div>
 
         {/* ── 3. CHALLENGE & SOLUTION (Editorial Layout) ── */}
         <div className="flex flex-col gap-24 md:gap-32 max-w-5xl mx-auto w-full">
-          
+
           {/* Challenge */}
           <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 md:gap-24 scroll-text opacity-0 translate-y-[40px]">
             <h3 className="text-white/40 text-2xl md:text-3xl font-medium tracking-tight flex items-center gap-2">
               Challenges<span className="text-[#f04e00] text-3xl leading-none">.</span>
             </h3>
-            <p className="text-white/80 text-lg md:text-xl font-normal leading-[1.8]">
+            <p className="text-white/90 text-xl md:text-3xl font-medium leading-[1.4] tracking-tight">
               {project.challenge}
             </p>
           </div>
@@ -161,7 +161,7 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
             <h3 className="text-white/40 text-2xl md:text-3xl font-medium tracking-tight flex items-center gap-2">
               Solutions<span className="text-[#f04e00] text-3xl leading-none">.</span>
             </h3>
-            <p className="text-white/80 text-lg md:text-xl font-normal leading-[1.8]">
+            <p className="text-white/90 text-xl md:text-3xl font-medium leading-[1.4] tracking-tight">
               {project.solution}
             </p>
           </div>
