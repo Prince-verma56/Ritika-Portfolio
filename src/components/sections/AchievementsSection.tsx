@@ -14,13 +14,13 @@ const achievements = [
     prize: "50,000",
     descriptionPart1: "Secured 1st position among competing teams and won a",
     descriptionPart2: "cash prize for innovation in healthcare technology.",
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&q=90",
+    image: "https://res.cloudinary.com/dtslaveid/image/upload/v1781112160/Check_Kar_zoibaj.jpg",
   },
   {
     title: "CODEPUNK Hackathon",
     prize: "Official Recognition",
     description: "Recognized as Top 10 Runner-ups in Internal University rounds for IoT innovation management.",
-    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1200&q=90",
+    image: "https://res.cloudinary.com/dtslaveid/image/upload/v1781112162/Card_v9ecop.jpg",
   },
 ];
 
@@ -144,7 +144,7 @@ export default function AchievementsSection() {
                 alt={achievements[0].title}
                 fill
                 className="object-cover opacity-90"
-                sizes="100vw"
+                sizes="(max-width: 768px) calc(100vw - 48px), (max-width: 1024px) calc(100vw - 96px), (max-width: 1400px) calc(100vw - 160px), 1240px"
                 priority
               />
             </div>
@@ -174,7 +174,7 @@ export default function AchievementsSection() {
                 alt={achievements[1].title}
                 fill
                 className="object-cover opacity-80"
-                sizes="(max-width: 768px) 100vw, 50vw"
+                sizes="(max-width: 768px) calc(100vw - 48px), (max-width: 1152px) 40vw, 396px"
               />
             </div>
           </div>

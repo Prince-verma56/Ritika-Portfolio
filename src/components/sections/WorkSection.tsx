@@ -105,7 +105,7 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
     titleTl.to(".mask-title", {
       y: "0%",
       opacity: 1,
-      duration: 1.5,
+      duration: 1,
       ease: "power4.out",
     });
     titleTlRef.current = titleTl;
@@ -259,7 +259,7 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
                           alt={project.title}
                           fill
                           className="object-cover object-center opacity-90 transition-transform duration-700 group-hover:scale-105"
-                          sizes="(max-width: 1024px) 100vw, 70vw"
+                          sizes="(max-width: 768px) calc(100vw - 32px), (max-width: 1024px) calc(100vw - 128px), 784px"
                           priority={index === 0}
                         />
                       </div>

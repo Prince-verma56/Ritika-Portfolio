@@ -211,7 +211,7 @@ export default function ServicesSection() {
                               alt={service.title}
                               fill
                               className="object-cover"
-                              sizes="(max-width: 1024px) 100vw, 400px"
+                              sizes="(max-width: 768px) calc(100vw - 48px), (max-width: 1024px) calc(100vw - 96px), 350px"
                               priority={index === 0}
                             />
                           </div>

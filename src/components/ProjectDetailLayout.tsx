@@ -137,9 +137,9 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
         </div>
 
         {/* ── 2. HERO IMAGE ── */}
-        <div className="img-wrap relative w-full aspect-[16/12] md:aspect-[28/9] overflow-hidden rounded-xl" style={{ clipPath: "inset(100% 0 0 0)" }}>
-          <div className="img-inner absolute inset-0 -top-[15%] h-[130%] w-full">
-            <Image src={project.heroImage} alt={project.title} fill className="object-cover object-center " priority sizes="(max-width: 1400px) 100vw, 1400px" />
+        <div className="img-wrap relative w-full aspect-16/12 md:aspect-28/9 overflow-hidden rounded-xl" style={{ clipPath: "inset(100% 0 0 0)" }}>
+          <div className="img-inner absolute inset-0 top-[-15%] h-[130%] w-full">
+            <Image src={project.heroImage} alt={project.title} fill className="object-cover object-center " priority sizes="(max-width: 768px) calc(100vw - 48px), (max-width: 1024px) calc(100vw - 96px), (max-width: 1400px) calc(100vw - 160px), 1240px" />
           </div>
         </div>
 
@@ -171,9 +171,9 @@ export default function ProjectDetailLayout({ project }: { project: ProjectData 
         {project.galleryImages.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
             {project.galleryImages.map((img, i) => (
-              <div key={i} className={`img-wrap relative w-full aspect-[4/3] overflow-hidden rounded-xl ${i === 2 ? 'md:col-span-2 md:aspect-[21/9]' : ''}`} style={{ clipPath: "inset(100% 0 0 0)" }}>
-                <div className="img-inner absolute inset-0 -top-[15%] h-[130%] w-full">
-                  <Image src={img} alt={`Gallery ${i}`} fill className="object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1400px) 50vw, 700px" />
+              <div key={i} className={`img-wrap relative w-full aspect-4/3 overflow-hidden rounded-xl ${i === 2 ? 'md:col-span-2 md:aspect-[21/9]' : ''}`} style={{ clipPath: "inset(100% 0 0 0)" }}>
+                <div className="img-inner absolute inset-0 top-[-15%] h-[130%] w-full">
+                  <Image src={img} alt={`Gallery ${i}`} fill className="object-cover" sizes="(max-width: 768px) calc(100vw - 48px), (max-width: 1400px) calc(50vw - 80px), 604px" />
                 </div>
               </div>
             ))}
