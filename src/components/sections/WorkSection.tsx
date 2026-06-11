@@ -125,7 +125,6 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
       const maskedTexts = item.querySelectorAll(".mask-text");
       const menuItems = item.querySelectorAll(".menu-item");
       const imgWrap = item.querySelector(".img-wrap");
-      const imgInner = item.querySelector(".img-inner");
 
       const tl = gsap.timeline({ paused: true });
       tl.to(imgWrap, { clipPath: "inset(0% 0 0 0)", duration: 1.5, ease: "power3.inOut" })
@@ -140,23 +139,6 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
           start: "top 75%",
           onEnter: () => tl.play()
         });
-      }
-
-      if (imgInner) {
-        gsap.fromTo(
-          imgInner,
-          { yPercent: -15 },
-          {
-            yPercent: 15,
-            ease: "none",
-            scrollTrigger: {
-              trigger: imgWrap,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-            },
-          }
-        );
       }
     });
 
@@ -252,13 +234,13 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
                 {/* ── UPDATED: Wrapped with Next.js <Link> & Custom Follower ── */}
                 <Link href={project.link} className="block w-full">
                   <FollowerPointerCard title="View Project" className="w-full">
-                    <div className="img-wrap relative w-full aspect-[4/3] md:aspect-[16/10] overflow-hidden rounded-md group bg-neutral-900" style={{ clipPath: "inset(100% 0 0 0)" }}>
-                      <div className="img-inner absolute inset-0 -top-[15%] h-[130%] w-full">
+                    <div className="img-wrap relative w-full aspect-[4/3] md:aspect-[16/10] overflow-hidden rounded-md group bg-neutral-900 flex items-center justify-center" style={{ clipPath: "inset(100% 0 0 0)" }}>
+                      <div className="img-inner absolute inset-0 flex items-center justify-center">
                         <Image
                           src={project.image}
                           alt={project.title}
                           fill
-                          className="object-cover object-center opacity-90 transition-transform duration-700 group-hover:scale-105"
+                          className="object-contain object-center opacity-90 transition-transform duration-700 group-hover:scale-105"
                           sizes="(max-width: 768px) calc(100vw - 32px), (max-width: 1024px) calc(100vw - 128px), 784px"
                           priority={index === 0}
                         />
