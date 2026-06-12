@@ -13,7 +13,7 @@ const services = [
     title: "Web design & development",
     subtitle: "Logos, colors, type, your brand, fully alive.",
     tags: ["Responsive Design", "Interactive Design"],
-    image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1800&q=90",
+    image: "https://res.cloudinary.com/dtslaveid/image/upload/v1781283445/webdev.jpg_uolaee.jpg",
     year: "Frame 7",
   },
   {
@@ -21,7 +21,7 @@ const services = [
     title: "Social Media",
     subtitle: "Can handle different Social Media Account at different platforms.",
     tags: ["Instagram Design", "Content Templates"],
-    image: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1800&q=90",
+    image: "https://res.cloudinary.com/dtslaveid/image/upload/v1781283444/social.jpg_yiwiet.jpg",
     year: "Frame 8",
   },
   {
@@ -29,7 +29,7 @@ const services = [
     title: "Branding",
     subtitle: "Can handle different Social Media Account at different platforms.",
     tags: ["Logo Design", "Color System"],
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1800&q=90",
+    image: "https://res.cloudinary.com/dtslaveid/image/upload/v1781283444/brand.jpg_ggjt1s.jpg",
     year: "Frame 9",
   },
 ];
