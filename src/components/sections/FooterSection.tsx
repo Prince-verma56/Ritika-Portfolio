@@ -7,10 +7,10 @@ export default function FooterSection() {
         LET'S WORK <br />TOGETHER.
       </h2>
       <a
-        href="mailto:hello@yourportfolio.dev"
+        href="mailto:ritikarawat3225@gmail.com"
         className="text-lg md:text-2xl font-medium text-white border-b border-white/20 pb-2 hover:text-[#2b2b2b] hover:border-[#1d1d1d] transition-colors duration-300"
       >
-        hello@yourportfolio.dev
+        ritikarawat3225@gmail.com
       </a>
     </section>
   );
