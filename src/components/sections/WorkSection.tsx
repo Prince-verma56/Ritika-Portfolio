@@ -9,7 +9,18 @@ import { useLoader } from "@/context/LoaderContext";
 import { FollowerPointerCard } from "@/components/FollowerPointerCard";
 
 gsap.registerPlugin(ScrollTrigger);
-const projects = [
+type Project = {
+  id: string;
+  title: string;
+  subtitle: string;
+  tags: string[];
+  image: string;
+  link: string;
+  year: string;
+  visual?: React.ReactNode;
+};
+
+const projects: Project[] = [
   {
     id: "01",
     title: "Adhayaya",
@@ -417,7 +428,7 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
                 {projects.map((p, i) => (
                   <div
                     key={`num-${p.id}`}
-                    className={`absolute inset-0 flex items-center transition-transform duration-[800ms] ease-[cubic-bezier(0.87,0,0.13,1)] ${i === activeIndex
+                    className={`absolute inset-0 flex items-center transition-transform duration-800 ease-[cubic-bezier(0.87,0,0.13,1)] ${i === activeIndex
                       ? "translate-y-0 opacity-100"
                       : i < activeIndex
                         ? "-translate-y-full opacity-0"
@@ -469,7 +480,7 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
 
             <div
               ref={showcaseRef}
-              className="relative w-full max-w-[900px] aspect-[16/10] group"
+              className="relative w-full max-w-[900px] aspect-16/10 group"
               onMouseMove={handleShowcaseMouseMove}
               onMouseLeave={handleShowcaseMouseLeave}
             >
@@ -508,7 +519,7 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
                           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 70vw, 900px"
                           priority={i === 0}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#050505]/90 via-transparent to-[#050505]/40" />
+                        <div className="absolute inset-0 bg-linear-to-t from-[#050505]/90 via-transparent to-[#050505]/40" />
                       </div>
 
                       {/* ── IMAGE CORNER DETAILS ── */}
@@ -532,7 +543,7 @@ export default function WorkSection({ isStandalonePage = false }: WorkSectionPro
               {projects.map((p, i) => (
                 <div
                   key={`visual-${p.id}`}
-                  className={`visual-${i} support-visual absolute -right-[8%] -top-[10%] z-20 pointer-events-none drop-shadow-[0_10px_20px_rgba(240,78,0,0.2)]`}
+                  className={`visual-${i} support-visual absolute right-[-8%] top-[-10%] z-20 pointer-events-none drop-shadow-[0_10px_20px_rgba(240,78,0,0.2)]`}
                   style={{ opacity: i === 0 ? 0.15 : 0 }}
                 >
                   {p.visual}
