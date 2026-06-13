@@ -23,6 +23,9 @@ export default function SmoothScroller({ children }: { children: React.ReactNode
 
     gsap.ticker.lagSmoothing(0);
 
+    // Refresh all ScrollTriggers after Lenis is ready so pin positions are accurate
+    ScrollTrigger.refresh();
+
     return () => {
       lenis.off("scroll", ScrollTrigger.update);
       lenis.destroy();
