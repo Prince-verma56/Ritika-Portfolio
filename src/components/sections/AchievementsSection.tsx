@@ -88,9 +88,9 @@ export default function AchievementsSection() {
       if (imgInner) {
         gsap.fromTo(
           imgInner,
-          { yPercent: -15 },
+          { yPercent: -10 },
           {
-            yPercent: 15,
+            yPercent: 10,
             ease: "none",
             scrollTrigger: {
               trigger: imgWrap,
